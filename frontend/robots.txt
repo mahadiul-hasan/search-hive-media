@@ -1,0 +1,4 @@
+User-agent: *
+Disallow:
+
+Sitemap: https://searchhivemedia.com/sitemap.xml
