@@ -3,9 +3,7 @@ import { AuthRoutes } from "../modules/auth/auth.route";
 import { UserRoutes } from "../modules/user/user.route";
 import { ContactRoutes } from "../modules/contact/contact.route";
 import { SearchFeedRoutes } from "../modules/searchFeed/searchFeed.route";
-// import { ClickRoutes } from "../modules/clickStat/click.route";
 import { SearchStatRoutes } from "../modules/searchStat/searchStat.route";
-import { ClickRoutes } from "../modules/click/click.route";
 import { DashboardRoutes } from "../modules/dashboard/dashboard.route";
 
 const router = express.Router();
@@ -26,10 +24,6 @@ const moduleRoutes = [
 	{
 		path: "/search-stats",
 		route: SearchStatRoutes,
-	},
-	{
-		path: "/clicks",
-		route: ClickRoutes,
 	},
 	{
 		path: "/dashboard",

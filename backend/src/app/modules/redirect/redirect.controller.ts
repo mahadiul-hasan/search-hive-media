@@ -1,47 +1,93 @@
 import { Request, Response } from "express";
 import dayjs from "dayjs";
-import redisClient from "../../../shared/redis";
+import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
 import { SearchFeed } from "../searchFeed/searchFeed.model";
-import { Click } from "../click/click.model";
-import { ApiError } from "../../../errors/ApiError";
+import { SearchStat } from "../searchStat/searchStat.model";
+import redisClient from "../../../shared/redis";
 import httpStatus from "http-status";
+import { ApiError } from "../../../errors/ApiError";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const handleShortUrlClick = async (
 	req: Request,
 	res: Response
 ): Promise<void> => {
 	const { shortUrl } = req.params;
-	const today = dayjs().format("YYYY-MM-DD");
+	const userCountry =
+		req.headers["cf-ipcountry"] || req.query.country || "BD";
+	const userIp = req.headers["cf-connecting-ip"] || req.query.ip;
 
-	// Try fetching from Redis cache first
-	let redisData = await redisClient.get(`short_url_obj:${shortUrl}`);
 	let feed;
+	const redisData = await redisClient.get(`short_url_obj:${shortUrl}`);
 
 	if (redisData) {
 		feed = JSON.parse(redisData);
 	} else {
-		// If not in cache, query MongoDB
 		feed = await SearchFeed.findOne({ short_url: shortUrl }).lean();
-		if (!feed) {
-			throw new ApiError(httpStatus.BAD_GATEWAY, "Short URL not found");
-		}
+		if (!feed)
+			throw new ApiError(httpStatus.NOT_FOUND, "Short URL not found");
 
-		// Cache it for 24 hours
 		await redisClient.setEx(
 			`short_url_obj:${shortUrl}`,
 			86400,
-			JSON.stringify({ _id: feed._id, original_url: feed.original_url })
+			JSON.stringify({
+				_id: feed._id,
+				user: feed.user,
+				countries: feed.countries,
+				original_url: feed.original_url,
+			})
 		);
 	}
 
-	// Increment the click count for today
-	await Click.findOneAndUpdate(
-		{ searchFeedId: feed._id, date: today },
-		{ $inc: { clicks: 1 } },
-		{ upsert: true, new: true }
-	);
+	// 🕐 Get current BD day range
+	const nowBD = dayjs().tz("Asia/Dhaka");
+	const startOfDay = nowBD.startOf("day").toDate();
+	const endOfDay = nowBD.endOf("day").toDate();
 
-	// Redirect the user to the original URL
+	let stat = await SearchStat.findOne({
+		searchFeed: feed._id,
+		createdAt: { $gte: startOfDay, $lte: endOfDay },
+	});
+
+	if (!stat) {
+		stat = new SearchStat({
+			searchFeed: feed._id,
+			user: feed.user,
+			searches: 0,
+			valid: 0,
+			mistake: 0,
+			visitors: 0,
+			unique_ips: 0,
+		});
+		await stat.save(); // Save it so we have _id for Redis
+	}
+
+	// Update logic
+	stat.searches += 1;
+	stat.visitors += 1;
+
+	if (feed.countries.includes(userCountry)) {
+		stat.valid += 1;
+	} else {
+		stat.mistake += 1;
+	}
+
+	// Redis IP tracking logic
+	const ipKey = `unique_ips:${stat._id}`;
+	const isNewIp = userIp
+		? await redisClient.sAdd(ipKey, userIp as string)
+		: 0;
+
+	if (isNewIp === 1) {
+		stat.unique_ips += 1;
+		await redisClient.expire(ipKey, 86400); // Ensure Redis TTL is 1 day
+	}
+
+	await stat.save();
+
 	res.redirect(feed.original_url);
 };
 

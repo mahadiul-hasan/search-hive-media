@@ -132,7 +132,7 @@ export function UpdateUserForm({
 			const res = await userUpdate({ id: userId, body: bodyData });
 			if ("data" in res) {
 				toast.success(res.data.message);
-				return navigate("/admin/user");
+				return navigate("/admin/users");
 			} else if ("error" in res) {
 				// @ts-expect-error since TS doesn't know the exact shape
 				toast.error(res?.error?.data || "An unknown error occurred.");

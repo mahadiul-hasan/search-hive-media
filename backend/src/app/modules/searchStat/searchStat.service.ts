@@ -3,23 +3,7 @@ import { ISearchStat } from "./searchStat.interface";
 import { ApiError } from "../../../errors/ApiError";
 import httpStatus from "http-status";
 import redisClient from "../../../shared/redis";
-import { SearchFeed } from "../searchFeed/searchFeed.model";
-
-const createSearchStat = async (data: ISearchStat) => {
-	const feed = await SearchFeed.findById(data.searchFeed);
-
-	if (!feed) {
-		throw new ApiError(httpStatus.BAD_REQUEST, "Search feed not found");
-	}
-
-	data.user = feed.user;
-
-	const result = await SearchStat.create(data);
-
-	await redisClient.del("searchStat:all");
-
-	return result;
-};
+import dayjs from "dayjs";
 
 const updateSearchStat = async (data: Partial<ISearchStat>, id: string) => {
 	const existing = await SearchStat.findById(id);
@@ -101,8 +85,74 @@ const getSingleSearchStat = async (id: string) => {
 	return stat;
 };
 
-const getMySearchStat = async (userId: string) => {
-	const myStats = await SearchStat.find({ user: userId })
+const getMySearchStat = async (userId: string, filterData: any) => {
+	const { filter, startDate, endDate, searchFeedId } = filterData;
+
+	const query: any = { user: userId };
+
+	// Optional: filter by searchFeed._id
+	if (searchFeedId) {
+		query.searchFeed = searchFeedId;
+	}
+
+	// Default: Today's statistics
+	if (!filter) {
+		query["createdAt"] = {
+			$gte: dayjs().startOf("day").toDate(),
+			$lte: dayjs().endOf("day").toDate(),
+		};
+	}
+
+	// Handle filter options
+	switch (filter) {
+		case "today":
+			query["createdAt"] = {
+				$gte: dayjs().startOf("day").toDate(),
+				$lte: dayjs().endOf("day").toDate(),
+			};
+			break;
+		case "yesterday":
+			query["createdAt"] = {
+				$gte: dayjs().subtract(1, "day").startOf("day").toDate(),
+				$lte: dayjs().subtract(1, "day").endOf("day").toDate(),
+			};
+			break;
+		case "this_week":
+			query["createdAt"] = {
+				$gte: dayjs().startOf("week").toDate(),
+				$lte: dayjs().endOf("week").toDate(),
+			};
+			break;
+		case "last_week":
+			query["createdAt"] = {
+				$gte: dayjs().subtract(1, "week").startOf("week").toDate(),
+				$lte: dayjs().subtract(1, "week").endOf("week").toDate(),
+			};
+			break;
+		case "this_month":
+			query["createdAt"] = {
+				$gte: dayjs().startOf("month").toDate(),
+				$lte: dayjs().endOf("month").toDate(),
+			};
+			break;
+		case "last_month":
+			query["createdAt"] = {
+				$gte: dayjs().subtract(1, "month").startOf("month").toDate(),
+				$lte: dayjs().subtract(1, "month").endOf("month").toDate(),
+			};
+			break;
+		case "custom":
+			if (startDate && endDate) {
+				query["createdAt"] = {
+					$gte: dayjs(startDate as string).toDate(),
+					$lte: dayjs(endDate as string).toDate(),
+				};
+			}
+			break;
+	}
+
+	const stats = await SearchStat.find(query)
+		.lean()
 		.populate({
 			path: "user",
 			select: "-password",
@@ -112,7 +162,7 @@ const getMySearchStat = async (userId: string) => {
 			select: "-original_url",
 		});
 
-	return myStats;
+	return stats;
 };
 
 const deleteSearchStat = async (id: string) => {
@@ -128,7 +178,6 @@ const deleteSearchStat = async (id: string) => {
 };
 
 export const SearchStatService = {
-	createSearchStat,
 	updateSearchStat,
 	getAllSearchStat,
 	getSingleSearchStat,

@@ -11,6 +11,7 @@ export interface ISearchFeed extends Document {
 	type_traffic?: string;
 	original_url: string;
 	short_url: string;
+	countries: [string];
 	user: Types.ObjectId;
 }
 

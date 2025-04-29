@@ -21,6 +21,7 @@ const SearchFeedSchema = new Schema<ISearchFeed, SearchFeedModel>(
 		type_traffic: String,
 		original_url: { type: String, required: true },
 		short_url: { type: String, required: true, unique: true },
+		countries: [{ type: String, required: true }],
 		user: { type: Schema.Types.ObjectId, ref: "User" },
 	},
 	{ timestamps: true, versionKey: false }

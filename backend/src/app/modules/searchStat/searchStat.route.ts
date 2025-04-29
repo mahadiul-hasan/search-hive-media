@@ -6,13 +6,6 @@ import { SearchStatController } from "./searchStat.controller";
 
 const router = express.Router();
 
-router.post(
-	"/create",
-	validateRequest(SearchStatValidation.create),
-	auth("admin"),
-	SearchStatController.createSearchStat
-);
-
 router.patch(
 	"/:id",
 	validateRequest(SearchStatValidation.update),

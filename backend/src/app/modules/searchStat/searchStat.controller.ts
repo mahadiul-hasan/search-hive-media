@@ -5,16 +5,6 @@ import httpStatus from "http-status";
 import { SearchStatService } from "./searchStat.service";
 import { ApiError } from "../../../errors/ApiError";
 
-const createSearchStat = catchAsync(async (req: Request, res: Response) => {
-	await SearchStatService.createSearchStat(req.body);
-
-	sendResponse(res, {
-		statusCode: httpStatus.CREATED,
-		success: true,
-		message: "Search Stat created successfully",
-	});
-});
-
 const updateSearchStat = catchAsync(async (req: Request, res: Response) => {
 	const id = req.params.id;
 	await SearchStatService.updateSearchStat(req.body, id);
@@ -54,7 +44,7 @@ const getMySearchStat = catchAsync(async (req: Request, res: Response) => {
 	if (!id) {
 		throw new ApiError(httpStatus.BAD_REQUEST, "User ID not found");
 	}
-	const result = await SearchStatService.getMySearchStat(id);
+	const result = await SearchStatService.getMySearchStat(id, req.query);
 
 	sendResponse(res, {
 		statusCode: httpStatus.OK,
@@ -76,7 +66,6 @@ const deleteSearchStat = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const SearchStatController = {
-	createSearchStat,
 	updateSearchStat,
 	getAllSearchStat,
 	getSingleSearchStat,
