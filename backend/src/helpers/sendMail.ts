@@ -10,7 +10,7 @@ export const sendResetEmail = async (to: string, token: string) => {
 		},
 	});
 
-	const resetURL = `http://localhost:5173/reset-password/${token}`;
+	const resetURL = `https://dashboard.searchhivemedia.com/reset-password/${token}`;
 	const html = `
     <div style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 40px;">
       <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 6px; padding: 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
