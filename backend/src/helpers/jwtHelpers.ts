@@ -8,6 +8,12 @@ const createAccessToken = (payload: object): string => {
 	});
 };
 
+const createResetToken = (payload: object): string => {
+	return jwt.sign(payload, config.jwt.reset_secret as string, {
+		expiresIn: "1h",
+	});
+};
+
 const createRefreshToken = (payload: object): string => {
 	return jwt.sign(payload, config.jwt.refresh_secret as string, {
 		expiresIn: "30d",
@@ -20,6 +26,7 @@ const verifyToken = (token: string, secret: Secret): JwtPayload => {
 
 export const jwtHelpers = {
 	createAccessToken,
+	createResetToken,
 	createRefreshToken,
 	verifyToken,
 };

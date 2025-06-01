@@ -15,44 +15,55 @@ import {
 	FormMessage,
 } from "../ui/form";
 import toast from "react-hot-toast";
-import { storeUserInfo } from "@/services/auth.service";
-import { useUserLoginMutation } from "@/redux/api/authApi";
-import { Link } from "react-router";
+import { useNavigate, useParams } from "react-router";
+import { useResetPasswordMutation } from "@/redux/api/authApi";
 
-export function LoginForm({
+export function ResetPasswordForm({
 	className,
 	...props
 }: React.ComponentPropsWithoutRef<"div">) {
-	const [userLogin, { isLoading }] = useUserLoginMutation();
+	const { token } = useParams();
+	console.log(token);
+	const navigate = useNavigate();
+	const [resetPassword, { isLoading }] = useResetPasswordMutation();
 
-	const formSchema = z.object({
-		email: z
-			.string({
-				required_error: "Email is required",
-			})
-			.email(),
-		password: z
-			.string({
-				required_error: "password is required",
-			})
-			.min(6, "Password must be at least 6 characters"),
-	});
+	const formSchema = z
+		.object({
+			password: z
+				.string({
+					required_error: "Password is required",
+				})
+				.min(6, "Password must be at least 6 characters"),
+			confirmPassword: z.string({
+				required_error: "Confirm Password is required",
+			}),
+		})
+		.refine((data) => data.password === data.confirmPassword, {
+			message: "Passwords do not match",
+			path: ["confirmPassword"],
+		});
 
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
-			email: "",
 			password: "",
+			confirmPassword: "",
 		},
 	});
 
 	async function onSubmit(values: z.infer<typeof formSchema>) {
+		if (!token) {
+			toast.error("Missing reset token.");
+			return;
+		}
+
 		try {
-			const res = await userLogin({ ...values });
+			const { password } = values;
+			const res = await resetPassword({ token, password });
+
 			if ("data" in res) {
-				storeUserInfo({ accessToken: res.data.data.accessToken });
 				toast.success(res.data.message);
-				window.location.href = "/dashboard";
+				navigate("/login");
 			} else if ("error" in res) {
 				// @ts-expect-error since TS doesn't know the exact shape
 				toast.error(res?.error?.data || "An unknown error occurred.");
@@ -67,7 +78,7 @@ export function LoginForm({
 			<Card>
 				<CardHeader>
 					<CardTitle className="text-2xl text-center">
-						Welcome Back!
+						Reset Password
 					</CardTitle>
 				</CardHeader>
 				<CardContent>
@@ -78,14 +89,14 @@ export function LoginForm({
 						>
 							<FormField
 								control={form.control}
-								name="email"
+								name="password"
 								render={({ field }) => (
 									<FormItem>
-										<FormLabel>Email</FormLabel>
+										<FormLabel>Password</FormLabel>
 										<FormControl>
 											<Input
-												placeholder="example@gmail.com"
-												type="email"
+												type="password"
+												placeholder="New password"
 												{...field}
 											/>
 										</FormControl>
@@ -93,25 +104,20 @@ export function LoginForm({
 									</FormItem>
 								)}
 							/>
+
 							<FormField
 								control={form.control}
-								name="password"
+								name="confirmPassword"
 								render={({ field }) => (
 									<FormItem>
-										<FormLabel>Password</FormLabel>
+										<FormLabel>Confirm Password</FormLabel>
 										<FormControl>
 											<Input
-												placeholder="******"
 												type="password"
+												placeholder="Confirm password"
 												{...field}
 											/>
 										</FormControl>
-										<Link
-											to="/forgot-password"
-											className="flex justify-end text-blue-600 underline"
-										>
-											Forgot password?
-										</Link>
 										<FormMessage />
 									</FormItem>
 								)}
@@ -119,7 +125,7 @@ export function LoginForm({
 
 							<div className="flex justify-center items-center">
 								<Button type="submit">
-									{isLoading ? "Submitting..." : "Login"}
+									{isLoading ? "Submitting..." : "Submit"}
 								</Button>
 							</div>
 						</form>

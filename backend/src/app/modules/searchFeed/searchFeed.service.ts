@@ -18,6 +18,8 @@ const createSearchFeed = async (data: ISearchFeed) => {
 	const redisData = {
 		_id: result._id,
 		original_url: result.original_url,
+		countries: result.countries || [],
+		user: result.user,
 	};
 
 	await redisClient.setEx(
@@ -39,6 +41,10 @@ const updateSearchFeed = async (data: Partial<ISearchFeed>, id: string) => {
 		data.original_url !== undefined &&
 		data.original_url !== existing.original_url;
 
+	const countriesChanged =
+		data.countries !== undefined &&
+		JSON.stringify(data.countries) !== JSON.stringify(existing.countries);
+
 	let newShortUrl = existing.short_url;
 
 	if (originalUrlChanged) {
@@ -46,17 +52,40 @@ const updateSearchFeed = async (data: Partial<ISearchFeed>, id: string) => {
 		data.short_url = newShortUrl;
 	}
 
+	// Handle countries update with proper typing
+	if (data.countries !== undefined) {
+		data.countries = Array.isArray(data.countries)
+			? ([...data.countries] as [string])
+			: undefined;
+	}
+
 	const updated = await SearchFeed.findByIdAndUpdate(id, data, { new: true });
+	if (!updated) {
+		throw new ApiError(
+			httpStatus.INTERNAL_SERVER_ERROR,
+			"Failed to update search feed"
+		);
+	}
 
-	if (originalUrlChanged) {
-		await redisClient.del(`short_url:${existing.short_url}`);
-
-		if (data.original_url) {
-			await redisClient.set(
-				`short_url:${newShortUrl}`,
-				data.original_url
-			);
+	if (originalUrlChanged || countriesChanged) {
+		// Delete old Redis key if URL changed
+		if (originalUrlChanged) {
+			await redisClient.del(`short_url_obj:${existing.short_url}`);
 		}
+
+		// Create/update Redis entry with new data
+		const redisData = {
+			_id: updated._id,
+			original_url: updated.original_url,
+			countries: updated.countries || [], // Use empty array for Redis if undefined
+			user: updated.user,
+		};
+
+		await redisClient.setEx(
+			`short_url_obj:${newShortUrl}`,
+			86400,
+			JSON.stringify(redisData)
+		);
 	}
 
 	return updated;

@@ -3,18 +3,18 @@ import { ISearchStat, SearchStatModel } from "./searchStat.interface";
 
 const SearchStatSchema = new Schema<ISearchStat, SearchStatModel>(
 	{
-		searches: { type: String, default: "0" },
-		valid: { type: String, default: "0" },
-		mistake: { type: String, default: "0" },
-		monetized: { type: String, default: "0" },
-		unique_ips: { type: String, default: "0" },
-		visitors: { type: String, default: "0" },
-		ctr: { type: String, default: "0" },
-		coverage: { type: String, default: "0" },
-		clicks: { type: String, default: "0" },
-		epc: { type: String, default: "0" },
-		rpm: { type: String, default: "0" },
-		revenue: { type: String, default: "0" },
+		searches: { type: Number, default: 0 },
+		valid: { type: Number, default: 0 },
+		mistake: { type: Number, default: 0 },
+		monetized: { type: Number, default: 0 },
+		unique_ips: { type: Number, default: 0 },
+		visitors: { type: Number, default: 0 },
+		ctr: { type: Number, default: 0 },
+		coverage: { type: Number, default: 0 },
+		clicks: { type: Number, default: 0 },
+		epc: { type: Number, default: 0 },
+		rpm: { type: Number, default: 0 },
+		revenue: { type: Number, default: 0 },
 
 		// Optional fields
 		ip: { type: String, required: false },

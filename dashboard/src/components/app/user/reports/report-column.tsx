@@ -8,107 +8,149 @@ export const ReportColumns: ColumnDef<ISearchStat>[] = [
 	{
 		accessorKey: "_id",
 		header: "ID",
-		cell: ({ row }: any) => <div>{row.getValue("_id")}</div>,
+		cell: ({ row }: any) => (
+			<div className="text-center">{row.getValue("_id")}</div>
+		),
 	},
 	{
 		accessorKey: "user.name",
 		header: "User",
-		cell: ({ row }: any) => <div>{row.original.user?.name}</div>,
+		cell: ({ row }: any) => (
+			<div className="text-center">{row.original.user?.name}</div>
+		),
 	},
 	{
 		accessorKey: "searches",
 		header: "Searches",
-		cell: ({ row }: any) => <div>{row.getValue("searches")}</div>,
+		cell: ({ row }: any) => (
+			<div className="text-center">{row.getValue("searches")}</div>
+		),
 	},
 	{
 		accessorKey: "valid",
 		header: "Valid",
-		cell: ({ row }: any) => <div>{row.getValue("valid")}</div>,
+		cell: ({ row }: any) => (
+			<div className="text-center">{row.getValue("valid")}</div>
+		),
 	},
 	{
 		accessorKey: "mistake",
 		header: "Errors",
-		cell: ({ row }: any) => <div>{row.getValue("mistake")}</div>,
+		cell: ({ row }: any) => (
+			<div className="text-center">{row.getValue("mistake")}</div>
+		),
 	},
 	{
 		accessorKey: "monetized",
 		header: "Monetized",
-		cell: ({ row }: any) => <div>{row.getValue("monetized")}</div>,
+		cell: ({ row }: any) => (
+			<div className="text-center">{row.getValue("monetized")}</div>
+		),
 	},
 	{
 		accessorKey: "unique_ips",
 		header: "Unique IPs",
-		cell: ({ row }: any) => <div>{row.getValue("unique_ips")}</div>,
+		cell: ({ row }: any) => (
+			<div className="text-center">{row.getValue("unique_ips")}</div>
+		),
 	},
 	{
 		accessorKey: "visitors",
 		header: "Visitors",
-		cell: ({ row }: any) => <div>{row.getValue("visitors")}</div>,
+		cell: ({ row }: any) => (
+			<div className="text-center">{row.getValue("visitors")}</div>
+		),
 	},
 	{
 		accessorKey: "ctr",
 		header: "CTR",
-		cell: ({ row }: any) => <div>{row.getValue("ctr")}</div>,
+		cell: ({ row }: any) => (
+			<div className="text-center">{row.getValue("ctr")}</div>
+		),
 	},
 	{
 		accessorKey: "coverage",
 		header: "Coverage",
-		cell: ({ row }: any) => <div>{row.getValue("coverage")}</div>,
+		cell: ({ row }: any) => (
+			<div className="text-center">{row.getValue("coverage")}</div>
+		),
 	},
 	{
 		accessorKey: "clicks",
 		header: "Clicks",
-		cell: ({ row }: any) => <div>{row.getValue("clicks")}</div>,
+		cell: ({ row }: any) => (
+			<div className="text-center">{row.getValue("clicks")}</div>
+		),
 	},
 	{
 		accessorKey: "epc",
 		header: "EPC",
-		cell: ({ row }: any) => <div>{row.getValue("epc")}</div>,
+		cell: ({ row }: any) => (
+			<div className="text-center">{row.getValue("epc")}</div>
+		),
 	},
 	{
 		accessorKey: "rpm",
 		header: "RPM",
-		cell: ({ row }: any) => <div>{row.getValue("rpm")}</div>,
+		cell: ({ row }: any) => (
+			<div className="text-center">{row.getValue("rpm")}</div>
+		),
 	},
 	{
 		accessorKey: "revenue",
 		header: "Revenue",
-		cell: ({ row }: any) => <div>{row.getValue("revenue")}</div>,
+		cell: ({ row }: any) => (
+			<div className="text-center">{row.getValue("revenue")}</div>
+		),
 	},
 	{
 		accessorKey: "searchFeed._id",
 		header: "Search Feed ID",
-		cell: ({ row }: any) => <div>{row.original.searchFeed?._id}</div>,
+		cell: ({ row }: any) => (
+			<div className="text-center">{row.original.searchFeed?._id}</div>
+		),
 	},
 	{
 		accessorKey: "ip",
 		header: "IP",
-		cell: ({ row }: any) => <div>{row.getValue("ip")}</div>,
+		cell: ({ row }: any) => (
+			<div className="text-center">{row.getValue("ip")}</div>
+		),
 	},
 	{
 		accessorKey: "os",
 		header: "OS",
-		cell: ({ row }: any) => <div>{row.getValue("os")}</div>,
+		cell: ({ row }: any) => (
+			<div className="text-center">{row.getValue("os")}</div>
+		),
 	},
 	{
 		accessorKey: "browser",
 		header: "Browser",
-		cell: ({ row }: any) => <div>{row.getValue("browser")}</div>,
+		cell: ({ row }: any) => (
+			<div className="text-center">{row.getValue("browser")}</div>
+		),
 	},
 	{
 		accessorKey: "device",
 		header: "Device",
-		cell: ({ row }: any) => <div>{row.getValue("device")}</div>,
+		cell: ({ row }: any) => (
+			<div className="text-center">{row.getValue("device")}</div>
+		),
 	},
 	{
 		accessorKey: "domain",
 		header: "Domain",
-		cell: ({ row }: any) => <div>{row.getValue("domain")}</div>,
+		cell: ({ row }: any) => (
+			<div className="text-center">{row.getValue("domain")}</div>
+		),
 	},
 	{
 		accessorKey: "keyword",
 		header: "Keyword",
-		cell: ({ row }: any) => <div>{row.getValue("keyword")}</div>,
+		cell: ({ row }: any) => (
+			<div className="text-center">{row.getValue("keyword")}</div>
+		),
 	},
 	{
 		accessorKey: "createdAt",
@@ -129,7 +171,7 @@ export const ReportColumns: ColumnDef<ISearchStat>[] = [
 				month: "short",
 				day: "numeric",
 			}).format(date);
-			return <div>{formatted}</div>;
+			return <div className="text-center">{formatted}</div>;
 		},
 		filterFn: (row, columnId, filterValue: string) => {
 			const rowDate = new Date(row.getValue(columnId));

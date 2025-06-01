@@ -12,7 +12,6 @@ import {
 	getSortedRowModel,
 	useReactTable,
 } from "@tanstack/react-table";
-import { ChevronDown } from "lucide-react";
 
 import {
 	Table,
@@ -22,13 +21,6 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
-import {
-	DropdownMenu,
-	DropdownMenuCheckboxItem,
-	DropdownMenuContent,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
 import { Button } from "../../../ui/button";
 
 interface DataTableProps<TData, TValue> {
@@ -46,8 +38,6 @@ export function SearchStatDataTable<TData, TValue>({
 	const [columnVisibility, setColumnVisibility] =
 		React.useState<VisibilityState>({});
 	const [rowSelection, setRowSelection] = React.useState({});
-
-	const [selectedDate, setSelectedDate] = React.useState<Date | null>(null);
 
 	const table = useReactTable({
 		data,
@@ -68,58 +58,8 @@ export function SearchStatDataTable<TData, TValue>({
 		},
 	});
 
-	// Date range filtering logic
-	React.useEffect(() => {
-		if (selectedDate) {
-			// Set filter based on selected date
-			const formattedDate = `${selectedDate.getFullYear()}-${(
-				selectedDate.getMonth() + 1
-			)
-				.toString()
-				.padStart(2, "0")}-${selectedDate
-				.getDate()
-				.toString()
-				.padStart(2, "0")}`;
-			table.getColumn("createdAt")?.setFilterValue(formattedDate);
-		} else {
-			// Clear filter if no date is selected
-			table.getColumn("createdAt")?.setFilterValue(undefined);
-		}
-	}, [selectedDate, table]);
-
 	return (
 		<div className="w-full">
-			<div className="flex items-center py-4">
-				<Input
-					type="date"
-					className="w-40"
-					onChange={(e) => setSelectedDate(new Date(e.target.value))}
-				/>
-				<DropdownMenu>
-					<DropdownMenuTrigger asChild>
-						<Button variant="outline" className="ml-auto">
-							Columns <ChevronDown />
-						</Button>
-					</DropdownMenuTrigger>
-					<DropdownMenuContent align="end">
-						{table
-							.getAllColumns()
-							.filter((column: any) => column.getCanHide())
-							.map((column: any) => (
-								<DropdownMenuCheckboxItem
-									key={column.id}
-									className="capitalize"
-									checked={column.getIsVisible()}
-									onCheckedChange={(value) =>
-										column.toggleVisibility(!!value)
-									}
-								>
-									{column.id}
-								</DropdownMenuCheckboxItem>
-							))}
-					</DropdownMenuContent>
-				</DropdownMenu>
-			</div>
 			<div className="rounded-md border">
 				<Table>
 					<TableHeader>

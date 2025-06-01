@@ -17,6 +17,11 @@ const create = z.object({
 		type_search: z.string().optional(),
 		type_traffic: z.string().optional(),
 		original_url: z.string().url(),
+		countries: z.array(
+			z.string({
+				required_error: "Country is required",
+			})
+		),
 		user: z.string({
 			required_error: "User ID is required",
 		}),
@@ -36,6 +41,7 @@ const update = z.object({
 		type_search: z.string().optional(),
 		type_traffic: z.string().optional(),
 		original_url: z.string().url(),
+		countries: z.array(z.string().optional()),
 		user: z.string().optional(),
 	}),
 });

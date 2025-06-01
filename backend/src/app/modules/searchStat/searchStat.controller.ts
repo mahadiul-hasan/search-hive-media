@@ -4,6 +4,7 @@ import { sendResponse } from "../../../shared/sendResponse";
 import httpStatus from "http-status";
 import { SearchStatService } from "./searchStat.service";
 import { ApiError } from "../../../errors/ApiError";
+import { DateFilter, SearchStatFilters } from "./searchStat.interface";
 
 const updateSearchStat = catchAsync(async (req: Request, res: Response) => {
 	const id = req.params.id;
@@ -17,7 +18,20 @@ const updateSearchStat = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getAllSearchStat = catchAsync(async (req: Request, res: Response) => {
-	const result = await SearchStatService.getAllSearchStat();
+	const { dateFilter, searchFeedId } = req.query;
+
+	// Extract 'customRange[from]' and 'customRange[to]' explicitly
+	const from = req.query["customRange[from]"] as string | undefined;
+	const to = req.query["customRange[to]"] as string | undefined;
+
+	const filters: SearchStatFilters = {
+		dateFilter: dateFilter as DateFilter | undefined,
+		searchFeedId: searchFeedId as string | undefined,
+		customRange:
+			dateFilter === "custom" && from && to ? { from, to } : undefined,
+	};
+
+	const result = await SearchStatService.getAllSearchStat(filters);
 
 	sendResponse(res, {
 		statusCode: httpStatus.OK,
@@ -44,7 +58,21 @@ const getMySearchStat = catchAsync(async (req: Request, res: Response) => {
 	if (!id) {
 		throw new ApiError(httpStatus.BAD_REQUEST, "User ID not found");
 	}
-	const result = await SearchStatService.getMySearchStat(id, req.query);
+
+	const { dateFilter, searchFeedId } = req.query;
+
+	// Extract 'customRange[from]' and 'customRange[to]' explicitly
+	const from = req.query["customRange[from]"] as string | undefined;
+	const to = req.query["customRange[to]"] as string | undefined;
+
+	const filters: SearchStatFilters = {
+		dateFilter: dateFilter as DateFilter | undefined,
+		searchFeedId: searchFeedId as string | undefined,
+		customRange:
+			dateFilter === "custom" && from && to ? { from, to } : undefined,
+	};
+
+	const result = await SearchStatService.getMySearchStat(filters, id);
 
 	sendResponse(res, {
 		statusCode: httpStatus.OK,

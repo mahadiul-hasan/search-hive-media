@@ -47,17 +47,6 @@ export const navbarLinks = [
 		],
 	},
 	{
-		roles: ["admin"],
-		links: [
-			{
-				label: "Click Stats",
-				path: "/admin/click-stats",
-				icon: SearchIcon,
-				roles: ["admin"],
-			},
-		],
-	},
-	{
 		roles: ["user"],
 		links: [
 			{

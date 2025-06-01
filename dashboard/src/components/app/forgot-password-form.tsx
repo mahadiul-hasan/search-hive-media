@@ -15,44 +15,36 @@ import {
 	FormMessage,
 } from "../ui/form";
 import toast from "react-hot-toast";
-import { storeUserInfo } from "@/services/auth.service";
-import { useUserLoginMutation } from "@/redux/api/authApi";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
+import { useForgotPasswordMutation } from "@/redux/api/authApi";
 
-export function LoginForm({
+export function ForgotPasswordForm({
 	className,
 	...props
 }: React.ComponentPropsWithoutRef<"div">) {
-	const [userLogin, { isLoading }] = useUserLoginMutation();
-
+	const navigate = useNavigate();
+	const [forgotPassword, { isLoading }] = useForgotPasswordMutation();
 	const formSchema = z.object({
 		email: z
 			.string({
 				required_error: "Email is required",
 			})
 			.email(),
-		password: z
-			.string({
-				required_error: "password is required",
-			})
-			.min(6, "Password must be at least 6 characters"),
 	});
 
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
 			email: "",
-			password: "",
 		},
 	});
 
 	async function onSubmit(values: z.infer<typeof formSchema>) {
 		try {
-			const res = await userLogin({ ...values });
+			const res = await forgotPassword(values.email);
 			if ("data" in res) {
-				storeUserInfo({ accessToken: res.data.data.accessToken });
 				toast.success(res.data.message);
-				window.location.href = "/dashboard";
+				navigate("/login");
 			} else if ("error" in res) {
 				// @ts-expect-error since TS doesn't know the exact shape
 				toast.error(res?.error?.data || "An unknown error occurred.");
@@ -67,8 +59,11 @@ export function LoginForm({
 			<Card>
 				<CardHeader>
 					<CardTitle className="text-2xl text-center">
-						Welcome Back!
+						Forgot Password
 					</CardTitle>
+					<p>
+						Please provide email address to get forgot-password link
+					</p>
 				</CardHeader>
 				<CardContent>
 					<Form {...form}>
@@ -89,28 +84,11 @@ export function LoginForm({
 												{...field}
 											/>
 										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-							<FormField
-								control={form.control}
-								name="password"
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Password</FormLabel>
-										<FormControl>
-											<Input
-												placeholder="******"
-												type="password"
-												{...field}
-											/>
-										</FormControl>
 										<Link
-											to="/forgot-password"
-											className="flex justify-end text-blue-600 underline"
+											to="/login"
+											className="flex justify-end text-blue-500"
 										>
-											Forgot password?
+											Login
 										</Link>
 										<FormMessage />
 									</FormItem>
@@ -119,7 +97,7 @@ export function LoginForm({
 
 							<div className="flex justify-center items-center">
 								<Button type="submit">
-									{isLoading ? "Submitting..." : "Login"}
+									{isLoading ? "Submitting..." : "Submit"}
 								</Button>
 							</div>
 						</form>

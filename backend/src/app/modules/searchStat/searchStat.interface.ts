@@ -1,18 +1,18 @@
 import { Model, Types } from "mongoose";
 
 export interface ISearchStat extends Document {
-	searches: string;
-	valid: string;
-	mistake: string;
-	monetized: string;
-	unique_ips: string;
-	visitors: string;
-	ctr: string;
-	coverage: string;
-	clicks: string;
-	epc: string;
-	rpm: string;
-	revenue: string;
+	searches: number;
+	valid: number;
+	mistake: number;
+	monetized: number;
+	unique_ips: number;
+	visitors: number;
+	ctr: number;
+	coverage: number;
+	clicks: number;
+	epc: number;
+	rpm: number;
+	revenue: number;
 	ip: string;
 	os: string;
 	browser: string;
@@ -24,3 +24,21 @@ export interface ISearchStat extends Document {
 }
 
 export type SearchStatModel = Model<ISearchStat, Record<string, unknown>>;
+
+export type DateFilter =
+	| "today"
+	| "yesterday"
+	| "this_week"
+	| "last_week"
+	| "this_month"
+	| "last_month"
+	| "custom";
+
+export interface SearchStatFilters {
+	dateFilter?: DateFilter;
+	customRange?: {
+		from: string; // ISO date string
+		to: string; // ISO date string
+	};
+	searchFeedId?: string; // Mongo ObjectId as string
+}

@@ -5,9 +5,14 @@ const SEARCH_STAT_URL = "/search-stats";
 export const searchStatApi = baseApi.injectEndpoints({
 	endpoints: (build) => ({
 		searchStats: build.query({
-			query: () => ({
+			query: (filters: {
+				dateFilter?: string;
+				customRange?: { from: string; to: string };
+				searchFeedId?: string;
+			}) => ({
 				url: `${SEARCH_STAT_URL}`,
 				method: "GET",
+				params: filters,
 			}),
 			providesTags: [tagTypes.searchStat],
 		}),
@@ -19,19 +24,16 @@ export const searchStatApi = baseApi.injectEndpoints({
 			providesTags: [tagTypes.searchStat],
 		}),
 		mySearchStat: build.query({
-			query: () => ({
+			query: (filters: {
+				dateFilter?: string;
+				customRange?: { from: string; to: string };
+				searchFeedId?: string;
+			}) => ({
 				url: `${SEARCH_STAT_URL}/my`,
 				method: "GET",
+				params: filters,
 			}),
 			providesTags: [tagTypes.searchStat],
-		}),
-		createSearchStat: build.mutation({
-			query: (data) => ({
-				url: `${SEARCH_STAT_URL}/create`,
-				method: "POST",
-				data: data,
-			}),
-			invalidatesTags: [tagTypes.searchStat],
 		}),
 		updateSearchStat: build.mutation({
 			query: (data) => ({
@@ -55,7 +57,6 @@ export const {
 	useSearchStatsQuery,
 	useSingleSearchStatQuery,
 	useMySearchStatQuery,
-	useCreateSearchStatMutation,
 	useUpdateSearchStatMutation,
 	useDeleteSearchStatMutation,
 } = searchStatApi;

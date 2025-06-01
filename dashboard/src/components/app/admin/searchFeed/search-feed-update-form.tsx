@@ -26,7 +26,12 @@ import {
 } from "@/redux/api/searchFeedApi";
 import { IUser } from "@/types/user";
 import CustomSelect from "@/components/ui/CustomSelect";
-import { searchEngineOption, statusOption } from "@/utils/SelectFields";
+import {
+	countryOptions,
+	searchEngineOption,
+	statusOption,
+} from "@/utils/SelectFields";
+import { MultiSelect } from "@/components/ui/MultiSelect";
 
 export function UpdateSearchFeedForm({
 	className,
@@ -63,6 +68,7 @@ export function UpdateSearchFeedForm({
 		type_search: z.string().optional(),
 		type_traffic: z.string().optional(),
 		original_url: z.string().url(),
+		countries: z.array(z.string().optional()),
 		user: z.string().optional(),
 	});
 
@@ -78,6 +84,7 @@ export function UpdateSearchFeedForm({
 			type_search: "",
 			type_traffic: "",
 			original_url: "",
+			countries: [],
 			user: "",
 		},
 	});
@@ -94,6 +101,7 @@ export function UpdateSearchFeedForm({
 				type_search: searchFeed.type_search || "",
 				type_traffic: searchFeed.type_traffic || "",
 				original_url: searchFeed.original_url || "",
+				countries: searchFeed.countries || [],
 				user: searchFeed.user._id || "",
 			});
 		}
@@ -288,6 +296,14 @@ export function UpdateSearchFeedForm({
 											</FormItem>
 										)}
 									/>
+									<MultiSelect
+										label="Countries"
+										name="countries"
+										form={form}
+										options={countryOptions}
+									/>
+								</div>
+								<div>
 									<CustomSelect
 										label="User"
 										name="user"

@@ -17,12 +17,11 @@ import SearchFeed from "./pages/admin/searchFeed/SearchFeed";
 import CreateSearchFeed from "./pages/admin/searchFeed/CreateSearchFeed";
 import UpdateSearchFeed from "./pages/admin/searchFeed/UpdateSearchFeed";
 import SearchStat from "./pages/admin/searchStat/SearchStat";
-import CreateSearchStat from "./pages/admin/searchStat/CreateSearchStat";
 import UpdateSearchStat from "./pages/admin/searchStat/UpdateSearchStat";
-import ClickStat from "./pages/admin/ClickStat/ClickStat";
-import ClickDetails from "./pages/admin/ClickStat/ClickDetails";
 import UserSearchFeed from "./pages/user/searchFeed/UserSearchFeed";
 import Report from "./pages/user/reports/Report";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 function App() {
 	const user = getUserInfo() as any;
@@ -39,6 +38,8 @@ function App() {
 			/>
 
 			<Route path="/login" element={<Login />} />
+			<Route path="/forgot-password" element={<ForgotPassword />} />
+			<Route path="/reset-password/:token" element={<ResetPassword />} />
 
 			<Route element={<PrivateRoute user={user} allowedRole="admin" />}>
 				<Route path="/admin" element={<Layout />}>
@@ -64,17 +65,8 @@ function App() {
 					/>
 					<Route path="search-stats" element={<SearchStat />} />
 					<Route
-						path="create-search-stat"
-						element={<CreateSearchStat />}
-					/>
-					<Route
 						path="update-search-stat/:id"
 						element={<UpdateSearchStat />}
-					/>
-					<Route path="click-stats" element={<ClickStat />} />
-					<Route
-						path="click-stats/:shortUrl"
-						element={<ClickDetails />}
 					/>
 				</Route>
 			</Route>

@@ -1,9 +1,9 @@
 import { SearchStat } from "./searchStat.model";
-import { ISearchStat } from "./searchStat.interface";
+import { ISearchStat, SearchStatFilters } from "./searchStat.interface";
 import { ApiError } from "../../../errors/ApiError";
 import httpStatus from "http-status";
-import redisClient from "../../../shared/redis";
-import dayjs from "dayjs";
+import moment from "moment";
+import { Types } from "mongoose";
 
 const updateSearchStat = async (data: Partial<ISearchStat>, id: string) => {
 	const existing = await SearchStat.findById(id);
@@ -34,34 +34,77 @@ const updateSearchStat = async (data: Partial<ISearchStat>, id: string) => {
 			select: "-short_url",
 		});
 
-	// Invalidate Redis cache
-	await redisClient.del("searchStat:all");
-
 	return updated;
 };
 
-const getAllSearchStat = async () => {
-	// Check Redis cache
-	const cached = await redisClient.get("searchStat:all");
+const getAllSearchStat = async (
+	filters: SearchStatFilters
+): Promise<ISearchStat[]> => {
+	const {
+		dateFilter = "today",
+		customRange = {} as { from?: string; to?: string },
+		searchFeedId,
+	} = filters;
 
-	if (cached) {
-		return JSON.parse(cached);
+	const query: any = {};
+
+	let startDate: Date | undefined;
+	let endDate: Date | undefined;
+
+	switch (dateFilter) {
+		case "today":
+			startDate = moment().startOf("day").toDate();
+			endDate = moment().endOf("day").toDate();
+			break;
+		case "yesterday":
+			startDate = moment().subtract(1, "day").startOf("day").toDate();
+			endDate = moment().subtract(1, "day").endOf("day").toDate();
+			break;
+		case "this_week":
+			startDate = moment().startOf("week").toDate();
+			endDate = moment().endOf("week").toDate();
+			break;
+		case "last_week":
+			startDate = moment().subtract(1, "week").startOf("week").toDate();
+			endDate = moment().subtract(1, "week").endOf("week").toDate();
+			break;
+		case "this_month":
+			startDate = moment().startOf("month").toDate();
+			endDate = moment().endOf("month").toDate();
+			break;
+		case "last_month":
+			startDate = moment().subtract(1, "month").startOf("month").toDate();
+			endDate = moment().subtract(1, "month").endOf("month").toDate();
+			break;
+		case "custom":
+			if (customRange.from && customRange.to) {
+				startDate = moment(customRange.from).startOf("day").toDate();
+				endDate = moment(customRange.to).endOf("day").toDate();
+			}
+			break;
 	}
 
-	// Fetch from DB if not in cache
-	const searchStats = await SearchStat.find({})
-		.select("-short_url") // exclude short_url
+	if (startDate && endDate) {
+		query.createdAt = {
+			$gte: startDate,
+			$lte: endDate,
+		};
+	}
+
+	if (searchFeedId) {
+		query.searchFeed = new Types.ObjectId(searchFeedId);
+	}
+
+	const searchStats = await SearchStat.find(query)
+		.select("-short_url")
 		.populate({
 			path: "user",
-			select: "-password", // select specific fields as needed
+			select: "-password",
 		})
 		.populate({
 			path: "searchFeed",
 			select: "-short_url",
 		});
-
-	// Store in Redis cache
-	await redisClient.set("searchStat:all", JSON.stringify(searchStats));
 
 	return searchStats;
 };
@@ -85,84 +128,79 @@ const getSingleSearchStat = async (id: string) => {
 	return stat;
 };
 
-const getMySearchStat = async (userId: string, filterData: any) => {
-	const { filter, startDate, endDate, searchFeedId } = filterData;
+const getMySearchStat = async (
+	filters: SearchStatFilters,
+	userId: Types.ObjectId
+): Promise<ISearchStat[]> => {
+	const {
+		dateFilter = "today",
+		customRange = {} as { from?: string; to?: string },
+		searchFeedId,
+	} = filters;
 
-	const query: any = { user: userId };
+	const query: any = {
+		user: userId,
+	};
 
-	// Optional: filter by searchFeed._id
-	if (searchFeedId) {
-		query.searchFeed = searchFeedId;
-	}
+	let startDate: Date | undefined;
+	let endDate: Date | undefined;
 
-	// Default: Today's statistics
-	if (!filter) {
-		query["createdAt"] = {
-			$gte: dayjs().startOf("day").toDate(),
-			$lte: dayjs().endOf("day").toDate(),
-		};
-	}
-
-	// Handle filter options
-	switch (filter) {
+	switch (dateFilter) {
 		case "today":
-			query["createdAt"] = {
-				$gte: dayjs().startOf("day").toDate(),
-				$lte: dayjs().endOf("day").toDate(),
-			};
+			startDate = moment().startOf("day").toDate();
+			endDate = moment().endOf("day").toDate();
 			break;
 		case "yesterday":
-			query["createdAt"] = {
-				$gte: dayjs().subtract(1, "day").startOf("day").toDate(),
-				$lte: dayjs().subtract(1, "day").endOf("day").toDate(),
-			};
+			startDate = moment().subtract(1, "day").startOf("day").toDate();
+			endDate = moment().subtract(1, "day").endOf("day").toDate();
 			break;
 		case "this_week":
-			query["createdAt"] = {
-				$gte: dayjs().startOf("week").toDate(),
-				$lte: dayjs().endOf("week").toDate(),
-			};
+			startDate = moment().startOf("week").toDate();
+			endDate = moment().endOf("week").toDate();
 			break;
 		case "last_week":
-			query["createdAt"] = {
-				$gte: dayjs().subtract(1, "week").startOf("week").toDate(),
-				$lte: dayjs().subtract(1, "week").endOf("week").toDate(),
-			};
+			startDate = moment().subtract(1, "week").startOf("week").toDate();
+			endDate = moment().subtract(1, "week").endOf("week").toDate();
 			break;
 		case "this_month":
-			query["createdAt"] = {
-				$gte: dayjs().startOf("month").toDate(),
-				$lte: dayjs().endOf("month").toDate(),
-			};
+			startDate = moment().startOf("month").toDate();
+			endDate = moment().endOf("month").toDate();
 			break;
 		case "last_month":
-			query["createdAt"] = {
-				$gte: dayjs().subtract(1, "month").startOf("month").toDate(),
-				$lte: dayjs().subtract(1, "month").endOf("month").toDate(),
-			};
+			startDate = moment().subtract(1, "month").startOf("month").toDate();
+			endDate = moment().subtract(1, "month").endOf("month").toDate();
 			break;
 		case "custom":
-			if (startDate && endDate) {
-				query["createdAt"] = {
-					$gte: dayjs(startDate as string).toDate(),
-					$lte: dayjs(endDate as string).toDate(),
-				};
+			if (customRange.from && customRange.to) {
+				startDate = moment(customRange.from).startOf("day").toDate();
+				endDate = moment(customRange.to).endOf("day").toDate();
 			}
 			break;
 	}
 
-	const stats = await SearchStat.find(query)
-		.lean()
+	if (startDate && endDate) {
+		query.createdAt = {
+			$gte: startDate,
+			$lte: endDate,
+		};
+	}
+
+	if (searchFeedId) {
+		query.searchFeed = new Types.ObjectId(searchFeedId);
+	}
+
+	const searchStats = await SearchStat.find(query)
+		.select("-short_url")
 		.populate({
 			path: "user",
 			select: "-password",
 		})
 		.populate({
 			path: "searchFeed",
-			select: "-original_url",
+			select: "-short_url",
 		});
 
-	return stats;
+	return searchStats;
 };
 
 const deleteSearchStat = async (id: string) => {
@@ -171,8 +209,6 @@ const deleteSearchStat = async (id: string) => {
 		throw new ApiError(httpStatus.BAD_REQUEST, "Search feed not found");
 	}
 	const result = await SearchStat.findByIdAndDelete(id);
-
-	await redisClient.del("searchStat:all");
 
 	return result;
 };

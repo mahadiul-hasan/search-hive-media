@@ -9,6 +9,7 @@ import {
 	IRefreshTokenResponse,
 } from "./auth.interface";
 import httpStatus from "http-status";
+import { sendResetEmail } from "../../../helpers/sendMail";
 
 const login = async (payload: ILogin) => {
 	const isUserExist = await User.isUserExist(payload.email);
@@ -44,7 +45,7 @@ const login = async (payload: ILogin) => {
 
 	return {
 		accessToken,
-		refreshToken
+		refreshToken,
 	};
 };
 
@@ -111,8 +112,53 @@ const ChangePassword = async (
 	isUserExist.save();
 };
 
+const forgotPassword = async (email: string): Promise<void> => {
+	const isUserExist = await User.isUserExist(email);
+	if (!isUserExist) {
+		throw new ApiError(httpStatus.NOT_FOUND, "User does not exist");
+	}
+
+	const resetToken = jwtHelpers.createResetToken({
+		_id: isUserExist._id,
+		email: isUserExist.email,
+	});
+
+	// Send reset token via email
+
+	await sendResetEmail(email, resetToken);
+};
+
+const resetPassword = async (
+	token: string,
+	password: string
+): Promise<void> => {
+	let verifiedToken = null;
+	try {
+		verifiedToken = jwtHelpers.verifyToken(
+			token,
+			config.jwt.reset_secret as Secret
+		);
+	} catch (err) {
+		throw new ApiError(httpStatus.FORBIDDEN, "Invalid Reset Token");
+	}
+
+	const isUserExist = await User.findById(verifiedToken._id).select(
+		"+password"
+	);
+
+	if (!isUserExist) {
+		throw new ApiError(httpStatus.NOT_FOUND, "User does not exist");
+	}
+
+	isUserExist.password = password;
+
+	await isUserExist.save();
+};
+
 export const AuthService = {
 	login,
 	RefreshToken,
 	ChangePassword,
+	forgotPassword,
+	resetPassword,
 };

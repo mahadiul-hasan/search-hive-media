@@ -20,7 +20,12 @@ import { useCreateSearchFeedMutation } from "@/redux/api/searchFeedApi";
 import { useUsersQuery } from "@/redux/api/userApi";
 import CustomSelect from "@/components/ui/CustomSelect";
 import { IUser } from "@/types/user";
-import { searchEngineOption, statusOption } from "@/utils/SelectFields";
+import {
+	countryOptions,
+	searchEngineOption,
+	statusOption,
+} from "@/utils/SelectFields";
+import { MultiSelect } from "@/components/ui/MultiSelect";
 
 export function SearchFeedForm({
 	className,
@@ -52,6 +57,11 @@ export function SearchFeedForm({
 		type_search: z.string().optional(),
 		type_traffic: z.string().optional(),
 		original_url: z.string().url(),
+		countries: z.array(
+			z.string({
+				required_error: "Country is required",
+			})
+		),
 		user: z.string({
 			required_error: "User ID is required",
 		}),
@@ -69,6 +79,7 @@ export function SearchFeedForm({
 			type_search: "",
 			type_traffic: "",
 			original_url: "",
+			countries: [],
 			user: "",
 		},
 	});
@@ -244,6 +255,14 @@ export function SearchFeedForm({
 										</FormItem>
 									)}
 								/>
+								<MultiSelect
+									label="Countries"
+									name="countries"
+									form={form}
+									options={countryOptions}
+								/>
+							</div>
+							<div className="flex flex-col md:flex-row gap-4">
 								<CustomSelect
 									label="User"
 									name="user"

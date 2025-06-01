@@ -42,7 +42,6 @@ export function UpdateUserOwnForm({
 	const [updateUserOwn, { isLoading: isUpdating }] =
 		useUpdateUserOwnMutation();
 
-	// const navigate = useNavigate();
 	const formSchema = z.object({
 		name: z.string().optional(),
 		email: z.string().email().optional(),

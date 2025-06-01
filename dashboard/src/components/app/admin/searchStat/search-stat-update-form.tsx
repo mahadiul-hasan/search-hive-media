@@ -51,18 +51,18 @@ export function UpdateSearchStatForm({
 
 	// const navigate = useNavigate();
 	const formSchema = z.object({
-		searches: z.string().optional(),
-		valid: z.string().optional(),
-		mistake: z.string().optional(),
-		monetized: z.string().optional(),
-		unique_ips: z.string().optional(),
-		visitors: z.string().optional(),
-		ctr: z.string().optional(),
-		coverage: z.string().optional(),
-		clicks: z.string().optional(),
-		epc: z.string().optional(),
-		rpm: z.string().optional(),
-		revenue: z.string().optional(),
+		searches: z.number().optional(),
+		valid: z.number().optional(),
+		mistake: z.number().optional(),
+		monetized: z.number().optional(),
+		unique_ips: z.number().optional(),
+		visitors: z.number().optional(),
+		ctr: z.number().optional(),
+		coverage: z.number().optional(),
+		clicks: z.number().optional(),
+		epc: z.number().optional(),
+		rpm: z.number().optional(),
+		revenue: z.number().optional(),
 
 		ip: z.string().optional(),
 		os: z.string().optional(),
@@ -76,18 +76,18 @@ export function UpdateSearchStatForm({
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
-			searches: "",
-			valid: "",
-			mistake: "",
-			monetized: "",
-			unique_ips: "",
-			visitors: "",
-			ctr: "",
-			coverage: "",
-			clicks: "",
-			epc: "",
-			rpm: "",
-			revenue: "",
+			searches: 0,
+			valid: 0,
+			mistake: 0,
+			monetized: 0,
+			unique_ips: 0,
+			visitors: 0,
+			ctr: 0,
+			coverage: 0,
+			clicks: 0,
+			epc: 0,
+			rpm: 0,
+			revenue: 0,
 			ip: "",
 			os: "",
 			browser: "",
@@ -101,18 +101,18 @@ export function UpdateSearchStatForm({
 	useEffect(() => {
 		if (searchStat) {
 			form.reset({
-				searches: searchStat.searches || "",
-				valid: searchStat.valid || "",
-				mistake: searchStat.mistake || "",
-				monetized: searchStat.monetized || "",
-				unique_ips: searchStat.unique_ips || "",
-				visitors: searchStat.visitors || "",
-				ctr: searchStat.ctr || "",
-				coverage: searchStat.coverage || "",
-				clicks: searchStat.clicks || "",
-				epc: searchStat.epc || "",
-				rpm: searchStat.rpm || "",
-				revenue: searchStat.revenue || "",
+				searches: searchStat.searches || 0,
+				valid: searchStat.valid || 0,
+				mistake: searchStat.mistake || 0,
+				monetized: searchStat.monetized || 0,
+				unique_ips: searchStat.unique_ips || 0,
+				visitors: searchStat.visitors || 0,
+				ctr: searchStat.ctr || 0,
+				coverage: searchStat.coverage || 0,
+				clicks: searchStat.clicks || 0,
+				epc: searchStat.epc || 0,
+				rpm: searchStat.rpm || 0,
+				revenue: searchStat.revenue || 0,
 				ip: searchStat.ip || "",
 				os: searchStat.os || "",
 				browser: searchStat.browser || "",
@@ -173,7 +173,7 @@ export function UpdateSearchStatForm({
 												<FormControl>
 													<Input
 														placeholder="Enter total searches"
-														type="text"
+														type="number"
 														{...field}
 													/>
 												</FormControl>
@@ -190,7 +190,7 @@ export function UpdateSearchStatForm({
 												<FormControl>
 													<Input
 														placeholder="Enter valid clicks"
-														type="text"
+														type="number"
 														{...field}
 													/>
 												</FormControl>
@@ -209,7 +209,7 @@ export function UpdateSearchStatForm({
 												<FormControl>
 													<Input
 														placeholder="Enter errors clicks"
-														type="text"
+														type="number"
 														{...field}
 													/>
 												</FormControl>
@@ -226,7 +226,7 @@ export function UpdateSearchStatForm({
 												<FormControl>
 													<Input
 														placeholder="Enter monetized"
-														type="text"
+														type="number"
 														{...field}
 													/>
 												</FormControl>
@@ -247,7 +247,7 @@ export function UpdateSearchStatForm({
 												<FormControl>
 													<Input
 														placeholder="Enter unique ips"
-														type="text"
+														type="number"
 														{...field}
 													/>
 												</FormControl>
@@ -264,7 +264,7 @@ export function UpdateSearchStatForm({
 												<FormControl>
 													<Input
 														placeholder="Enter total visitors"
-														type="text"
+														type="number"
 														{...field}
 													/>
 												</FormControl>
@@ -283,7 +283,7 @@ export function UpdateSearchStatForm({
 												<FormControl>
 													<Input
 														placeholder="Enter ctr"
-														type="text"
+														type="number"
 														{...field}
 													/>
 												</FormControl>
@@ -300,7 +300,7 @@ export function UpdateSearchStatForm({
 												<FormControl>
 													<Input
 														placeholder="Enter coverage"
-														type="text"
+														type="number"
 														{...field}
 													/>
 												</FormControl>
@@ -319,7 +319,7 @@ export function UpdateSearchStatForm({
 												<FormControl>
 													<Input
 														placeholder="Enter clicks"
-														type="text"
+														type="number"
 														{...field}
 													/>
 												</FormControl>
@@ -336,7 +336,7 @@ export function UpdateSearchStatForm({
 												<FormControl>
 													<Input
 														placeholder="Enter epc"
-														type="text"
+														type="number"
 														{...field}
 													/>
 												</FormControl>
@@ -355,7 +355,7 @@ export function UpdateSearchStatForm({
 												<FormControl>
 													<Input
 														placeholder="Enter rpm"
-														type="text"
+														type="number"
 														{...field}
 													/>
 												</FormControl>
@@ -372,7 +372,7 @@ export function UpdateSearchStatForm({
 												<FormControl>
 													<Input
 														placeholder="Enter revenue"
-														type="text"
+														type="number"
 														{...field}
 													/>
 												</FormControl>

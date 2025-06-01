@@ -58,6 +58,28 @@ const changePassword = catchAsync(async (req: Request, res: Response) => {
 	});
 });
 
+const forgotPassword = catchAsync(async (req: Request, res: Response) => {
+	const { email } = req.body;
+	await AuthService.forgotPassword(email);
+
+	sendResponse(res, {
+		statusCode: httpStatus.OK,
+		success: true,
+		message: "Please check your email for reset password link",
+	});
+});
+
+const resetPassword = catchAsync(async (req: Request, res: Response) => {
+	const { token, password } = req.body;
+	await AuthService.resetPassword(token, password);
+
+	sendResponse(res, {
+		statusCode: httpStatus.OK,
+		success: true,
+		message: "Password reset successfully",
+	});
+});
+
 const logout = catchAsync(async (req: Request, res: Response) => {
 	res.clearCookie("refreshToken", {
 		httpOnly: true,
@@ -77,4 +99,6 @@ export const AuthController = {
 	refreshToken,
 	changePassword,
 	logout,
+	forgotPassword,
+	resetPassword,
 };
