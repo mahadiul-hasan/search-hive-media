@@ -20,35 +20,28 @@ app.set("trust proxy", true);
 
 app.disable("x-powered-by");
 
+const allowedOrigins = [
+	"https://dashboard.searchhivemedia.com",
+	"https://searchhivemedia.com",
+];
+
 app.use(
 	cors({
-		origin: "http://localhost:5173",
+		origin: function (origin, callback) {
+			if (!origin || allowedOrigins.includes(origin)) {
+				callback(null, true);
+			} else {
+				callback(new Error("Not allowed by CORS"));
+			}
+		},
 		credentials: true,
 	})
 );
 
-// const allowedOrigins = [
-// 	"https://dashboard.searchhivemedia.com",
-// 	"https://searchhivemedia.com",
-// ];
-
-// app.use(
-// 	cors({
-// 		origin: function (origin, callback) {
-// 			if (!origin || allowedOrigins.includes(origin)) {
-// 				callback(null, true);
-// 			} else {
-// 				callback(new Error("Not allowed by CORS"));
-// 			}
-// 		},
-// 		credentials: true,
-// 	})
-// );
-
 app.use("/", redirectRouter);
 app.use("/v1/", routers);
 
-// app.use(globalRateLimiter);
+app.use(globalRateLimiter);
 app.use(globalErrorHandler);
 
 // handle not found error
