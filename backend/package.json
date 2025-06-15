@@ -39,6 +39,7 @@
 		"@types/cors": "^2.8.17",
 		"@types/express": "^5.0.1",
 		"@types/jsonwebtoken": "^9.0.9",
+		"@types/moment-timezone": "^0.5.13",
 		"@types/node": "^24.0.1",
 		"@types/nodemailer": "^6.4.17",
 		"@types/redis": "^4.0.10",
