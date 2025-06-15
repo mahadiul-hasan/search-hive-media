@@ -1,6 +1,7 @@
 import { Model, Types } from "mongoose";
 
 export interface ISearchStat extends Document {
+	_id: Types.ObjectId;
 	searches: number;
 	valid: number;
 	mistake: number;
@@ -21,6 +22,7 @@ export interface ISearchStat extends Document {
 	keyword: string;
 	searchFeed: Types.ObjectId;
 	user: Types.ObjectId;
+	createdAt: Date;
 }
 
 export type SearchStatModel = Model<ISearchStat, Record<string, unknown>>;

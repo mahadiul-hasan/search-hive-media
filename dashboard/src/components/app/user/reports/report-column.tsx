@@ -8,15 +8,17 @@ export const ReportColumns: ColumnDef<ISearchStat>[] = [
 	{
 		accessorKey: "_id",
 		header: "ID",
-		cell: ({ row }: any) => (
-			<div className="text-center">{row.getValue("_id")}</div>
+		cell: ({ row }) => (
+			<div className="text-center text-sm font-mono">
+				{row.original.originalIds?.[0] || "N/A"}
+			</div>
 		),
 	},
 	{
-		accessorKey: "user.name",
-		header: "User",
+		accessorKey: "searchFeed.name",
+		header: "Feed Name",
 		cell: ({ row }: any) => (
-			<div className="text-center">{row.original.user?.name}</div>
+			<div className="text-center">{row.original.searchFeed?.name}</div>
 		),
 	},
 	{
@@ -101,13 +103,6 @@ export const ReportColumns: ColumnDef<ISearchStat>[] = [
 		header: "Revenue",
 		cell: ({ row }: any) => (
 			<div className="text-center">{row.getValue("revenue")}</div>
-		),
-	},
-	{
-		accessorKey: "searchFeed._id",
-		header: "Search Feed ID",
-		cell: ({ row }: any) => (
-			<div className="text-center">{row.original.searchFeed?._id}</div>
 		),
 	},
 	{

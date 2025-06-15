@@ -17,8 +17,10 @@ export const SearchStatColumns: ColumnDef<ISearchStat>[] = [
 	{
 		accessorKey: "_id",
 		header: "ID",
-		cell: ({ row }: any) => (
-			<div className="text-center">{row.getValue("_id")}</div>
+		cell: ({ row }) => (
+			<div className="text-center text-sm font-mono">
+				{row.original.originalIds?.[0] || "N/A"}
+			</div>
 		),
 	},
 	{

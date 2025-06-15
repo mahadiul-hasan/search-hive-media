@@ -5,68 +5,193 @@ import Loader from "@/components/Loader";
 import { useSearchFeedsQuery } from "@/redux/api/searchFeedApi";
 import { SearchStatDataTable } from "@/components/app/admin/searchStat/search-stat-table";
 import { SearchStatColumns } from "@/components/app/admin/searchStat/search-stat-column";
+import { CustomPagination } from "@/components/ui/CustomPagination";
+import { Button } from "@/components/ui/button";
+import { useDebounce } from "use-debounce";
+
+type DateFilter =
+	| "today"
+	| "yesterday"
+	| "this_week"
+	| "last_week"
+	| "this_month"
+	| "last_month"
+	| "custom";
+type GroupBy = "hour" | "day" | "month";
+
+interface Filters {
+	dateFilter: DateFilter;
+	from: string;
+	to: string;
+	searchFeedId: string;
+	groupBy: GroupBy;
+}
+
+interface AppliedFilters {
+	dateFilter: DateFilter;
+	customRange?: { from: string; to: string };
+	searchFeedId: string;
+	groupBy: GroupBy;
+}
 
 const filterOptions = [
-	"today",
-	"yesterday",
-	"this_week",
-	"last_week",
-	"this_month",
-	"last_month",
-	"custom",
+	{ value: "today" as const, label: "Today" },
+	{ value: "yesterday" as const, label: "Yesterday" },
+	{ value: "this_week" as const, label: "This Week" },
+	{ value: "last_week" as const, label: "Last Week" },
+	{ value: "this_month" as const, label: "This Month" },
+	{ value: "last_month" as const, label: "Last Month" },
+	{ value: "custom" as const, label: "Custom Range" },
+];
+
+const groupByOptions = [
+	{ value: "hour" as const, label: "Hourly" },
+	{ value: "day" as const, label: "Daily" },
+	{ value: "month" as const, label: "Monthly" },
 ];
 
 export default function SearchStat() {
-	const [dateFilter, setDateFilter] = useState("today");
-	const [from, setFrom] = useState("");
-	const [to, setTo] = useState("");
-	const [searchFeedId, setSearchFeedId] = useState("");
+	const [filters, setFilters] = useState<Filters>({
+		dateFilter: "today",
+		from: "",
+		to: "",
+		searchFeedId: "",
+		groupBy: "day",
+	});
+
+	const [appliedFilters, setAppliedFilters] = useState<AppliedFilters>({
+		dateFilter: "today",
+		searchFeedId: "",
+		groupBy: "day",
+	});
+
+	const [page, setPage] = useState(1);
+	const limit = 10;
 
 	// Fetch search feeds to populate dropdown
 	const { data: searchFeedsData, isLoading: isLoadingFeeds } =
 		useSearchFeedsQuery({});
 
-	// Fetch search stats with filters
-	const { data, isLoading, isFetching } = useSearchStatsQuery({
-		dateFilter,
-		...(dateFilter === "custom" && from && to
-			? { customRange: { from, to } }
-			: {}),
-		...(searchFeedId ? { searchFeedId } : {}),
-	});
+	const [filtersDebounced] = useDebounce(appliedFilters, 500);
 
-	const stats = data?.data || [];
+	const { data, isLoading, isFetching } = useSearchStatsQuery(
+		filtersDebounced,
+		{
+			refetchOnMountOrArgChange: true,
+		}
+	);
+
+	const stats = data?.data?.stats || [];
 	const searchFeeds = searchFeedsData?.data || [];
+	const total = data?.data.total || 0;
+	const totalSearches = data?.data.totalSearches || 0;
+	const totalRevenue = data?.data.totalRevenue || 0;
+
+	const handleFilterChange = () => {
+		const newAppliedFilters: AppliedFilters = {
+			dateFilter: filters.dateFilter,
+			searchFeedId: filters.searchFeedId,
+			groupBy: filters.groupBy, // Ensure this is included
+		};
+
+		if (filters.dateFilter === "custom") {
+			if (filters.from && filters.to) {
+				newAppliedFilters.customRange = {
+					from: filters.from,
+					to: filters.to,
+				};
+			} else {
+				alert(
+					"Please select both 'From' and 'To' dates for custom range"
+				);
+				return;
+			}
+		}
+
+		setAppliedFilters(newAppliedFilters);
+		setPage(1);
+	};
+
+	const handleResetFilters = () => {
+		setFilters({
+			dateFilter: "today",
+			from: "",
+			to: "",
+			searchFeedId: "",
+			groupBy: "day",
+		});
+		setAppliedFilters({
+			dateFilter: "today",
+			searchFeedId: "",
+			groupBy: "day",
+		});
+		setPage(1);
+	};
+
+	const handlePageChange = (newPage: number) => {
+		setPage(newPage);
+	};
 
 	return (
 		<div className="space-y-4">
 			<div className="flex flex-wrap gap-4 items-end">
-				{/* Date Filter Dropdown */}
+				{/* Group By Dropdown */}
 				<div>
-					<label className="block mb-1">Date Filter</label>
+					<label className="block mb-1">Group By</label>
 					<select
 						className="border px-2 py-1 rounded"
-						value={dateFilter}
-						onChange={(e) => setDateFilter(e.target.value)}
+						value={filters.groupBy}
+						onChange={(e) =>
+							setFilters({
+								...filters,
+								groupBy: e.target.value as GroupBy,
+							})
+						}
 					>
-						{filterOptions.map((option) => (
-							<option key={option} value={option}>
-								{option.replace("_", " ")}
+						{groupByOptions.map((option) => (
+							<option key={option.value} value={option.value}>
+								{option.label}
 							</option>
 						))}
 					</select>
 				</div>
 
-				{/* Custom Range Fields (only show if custom is selected) */}
-				{dateFilter === "custom" && (
+				{/* Date Filter Dropdown */}
+				<div>
+					<label className="block mb-1">Date Filter</label>
+					<select
+						className="border px-2 py-1 rounded"
+						value={filters.dateFilter}
+						onChange={(e) =>
+							setFilters({
+								...filters,
+								dateFilter: e.target.value as DateFilter,
+							})
+						}
+					>
+						{filterOptions.map((option) => (
+							<option key={option.value} value={option.value}>
+								{option.label}
+							</option>
+						))}
+					</select>
+				</div>
+
+				{/* Custom Range Fields */}
+				{filters.dateFilter === "custom" && (
 					<>
 						<div>
 							<label className="block mb-1">From</label>
 							<input
 								type="date"
 								className="border px-2 py-1 rounded"
-								value={from}
-								onChange={(e) => setFrom(e.target.value)}
+								value={filters.from}
+								onChange={(e) =>
+									setFilters({
+										...filters,
+										from: e.target.value,
+									})
+								}
 							/>
 						</div>
 						<div>
@@ -74,8 +199,13 @@ export default function SearchStat() {
 							<input
 								type="date"
 								className="border px-2 py-1 rounded"
-								value={to}
-								onChange={(e) => setTo(e.target.value)}
+								value={filters.to}
+								onChange={(e) =>
+									setFilters({
+										...filters,
+										to: e.target.value,
+									})
+								}
 							/>
 						</div>
 					</>
@@ -86,8 +216,13 @@ export default function SearchStat() {
 					<label className="block mb-1">Search Feed</label>
 					<select
 						className="border px-2 py-1 rounded"
-						value={searchFeedId}
-						onChange={(e) => setSearchFeedId(e.target.value)}
+						value={filters.searchFeedId}
+						onChange={(e) =>
+							setFilters({
+								...filters,
+								searchFeedId: e.target.value,
+							})
+						}
 					>
 						<option value="">All Feeds</option>
 						{isLoadingFeeds ? (
@@ -101,12 +236,59 @@ export default function SearchStat() {
 						)}
 					</select>
 				</div>
+
+				{/* Filter and Reset Buttons */}
+				<div className="flex gap-2">
+					<Button onClick={handleFilterChange}>Apply Filters</Button>
+					<Button variant="outline" onClick={handleResetFilters}>
+						Reset
+					</Button>
+				</div>
+			</div>
+
+			{/* Summary Cards */}
+			<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+				<div className="bg-white p-4 rounded shadow">
+					<h3 className="text-sm font-medium text-gray-500">
+						Total Searches
+					</h3>
+					<p className="text-2xl font-semibold">
+						{totalSearches.toLocaleString()}
+					</p>
+				</div>
+				<div className="bg-white p-4 rounded shadow">
+					<h3 className="text-sm font-medium text-gray-500">
+						Total Revenue
+					</h3>
+					<p className="text-2xl font-semibold">
+						${totalRevenue.toLocaleString()}
+					</p>
+				</div>
+				<div className="bg-white p-4 rounded shadow">
+					<h3 className="text-sm font-medium text-gray-500">
+						Records Found
+					</h3>
+					<p className="text-2xl font-semibold">
+						{total.toLocaleString()}
+					</p>
+				</div>
 			</div>
 
 			{isLoading || isFetching ? (
 				<Loader />
 			) : (
-				<SearchStatDataTable columns={SearchStatColumns} data={stats} />
+				<>
+					<SearchStatDataTable
+						columns={SearchStatColumns}
+						data={stats}
+					/>
+					<CustomPagination
+						currentPage={page}
+						totalItems={total}
+						itemsPerPage={limit}
+						onPageChange={handlePageChange}
+					/>
+				</>
 			)}
 		</div>
 	);

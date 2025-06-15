@@ -1,8 +1,10 @@
-import dayjs from "dayjs";
+import moment from "moment-timezone";
 import { SearchFeed } from "../searchFeed/searchFeed.model";
 import { SearchStat } from "../searchStat/searchStat.model";
 import { User } from "../user/user.model";
 import { Types } from "mongoose";
+
+const TIMEZONE = "Asia/Dhaka";
 
 const getAdminDashboardStat = async () => {
 	const [totalUsers, totalFeeds] = await Promise.all([
@@ -20,11 +22,18 @@ const getAdminDashboardStat = async () => {
 		},
 	]);
 
-	// Today and Yesterday ranges
-	const todayStart = dayjs().startOf("day").toDate();
-	const todayEnd = dayjs().endOf("day").toDate();
-	const yesterdayStart = dayjs().subtract(1, "day").startOf("day").toDate();
-	const yesterdayEnd = dayjs().subtract(1, "day").endOf("day").toDate();
+	const todayStart = moment().tz(TIMEZONE).startOf("day").toDate();
+	const todayEnd = moment().tz(TIMEZONE).endOf("day").toDate();
+	const yesterdayStart = moment()
+		.tz(TIMEZONE)
+		.subtract(1, "day")
+		.startOf("day")
+		.toDate();
+	const yesterdayEnd = moment()
+		.tz(TIMEZONE)
+		.subtract(1, "day")
+		.endOf("day")
+		.toDate();
 
 	const [todayStats, yesterdayStats] = await Promise.all([
 		SearchStat.aggregate([
@@ -55,8 +64,11 @@ const getAdminDashboardStat = async () => {
 		]),
 	]);
 
-	// 📊 Last 7 days for chart
-	const sevenDaysAgo = dayjs().subtract(6, "day").startOf("day").toDate();
+	const sevenDaysAgo = moment()
+		.tz(TIMEZONE)
+		.subtract(6, "day")
+		.startOf("day")
+		.toDate();
 
 	const dailyChartData = await SearchStat.aggregate([
 		{
@@ -76,7 +88,7 @@ const getAdminDashboardStat = async () => {
 		{ $sort: { _id: 1 } },
 	]);
 
-	const result = {
+	return {
 		totalUsers,
 		totalFeeds,
 		totalClicksAgg: aggregation[0]?.totalClicksAgg || 0,
@@ -85,14 +97,20 @@ const getAdminDashboardStat = async () => {
 		yesterdayClicks: yesterdayStats[0]?.clicks || 0,
 		dailyChartData,
 	};
-
-	return result;
 };
 
 const getUserDashboardStat = async (id: string) => {
-	const today = dayjs().startOf("day").toDate();
-	const yesterday = dayjs().subtract(1, "day").startOf("day").toDate();
-	const sevenDaysAgo = dayjs().subtract(6, "day").startOf("day").toDate();
+	const today = moment().tz(TIMEZONE).startOf("day").toDate();
+	const yesterday = moment()
+		.tz(TIMEZONE)
+		.subtract(1, "day")
+		.startOf("day")
+		.toDate();
+	const sevenDaysAgo = moment()
+		.tz(TIMEZONE)
+		.subtract(6, "day")
+		.startOf("day")
+		.toDate();
 
 	const [todayAgg, yesterdayAgg, user, dailyChartData] = await Promise.all([
 		SearchStat.aggregate([
@@ -156,7 +174,7 @@ const getUserDashboardStat = async (id: string) => {
 		todayValid: todayAgg[0]?.valid || 0,
 		yesterdayRevenue: yesterdayAgg[0]?.revenue || 0,
 		accountBalance: parseFloat(user?.personalDetails?.balance || "0"),
-		dailyChartData, // array of 7 days revenue/click/valid
+		dailyChartData,
 	};
 };
 

@@ -3,6 +3,7 @@ import { ISearchStat, SearchStatModel } from "./searchStat.interface";
 
 const SearchStatSchema = new Schema<ISearchStat, SearchStatModel>(
 	{
+		// Metrics fields
 		searches: { type: Number, default: 0 },
 		valid: { type: Number, default: 0 },
 		mistake: { type: Number, default: 0 },
@@ -16,22 +17,61 @@ const SearchStatSchema = new Schema<ISearchStat, SearchStatModel>(
 		rpm: { type: Number, default: 0 },
 		revenue: { type: Number, default: 0 },
 
-		// Optional fields
-		ip: { type: String, required: false },
-		os: { type: String, required: false },
-		browser: { type: String, required: false },
-		device: { type: String, required: false },
-		domain: { type: String, required: false },
-		keyword: { type: String, required: false },
+		// Optional tracking fields
+		ip: { type: String },
+		os: { type: String },
+		browser: { type: String },
+		device: { type: String },
+		domain: { type: String },
+		keyword: { type: String },
 
-		// Reference to SearchFeed
+		// Reference fields
 		searchFeed: {
 			type: Schema.Types.ObjectId,
 			ref: "SearchFeed",
+			required: true,
+			index: true,
 		},
-		user: { type: Schema.Types.ObjectId, ref: "User" },
+		user: {
+			type: Schema.Types.ObjectId,
+			ref: "User",
+			required: true,
+		},
 	},
-	{ timestamps: true, versionKey: false }
+	{
+		timestamps: true,
+		versionKey: false,
+		autoIndex: true, // Ensure indexes are created
+	}
+);
+
+// Compound indexes for optimized queries
+SearchStatSchema.index(
+	{
+		searchFeed: 1,
+		statType: 1,
+		createdAt: 1,
+	},
+	{ name: "feed_stat_type_timestamp_idx" }
+);
+
+SearchStatSchema.index(
+	{
+		user: 1,
+		createdAt: -1,
+	},
+	{ name: "user_timestamp_idx" }
+);
+
+// Index for time-range queries
+SearchStatSchema.index(
+	{
+		createdAt: 1,
+	},
+	{
+		name: "timestamp_idx",
+		expireAfterSeconds: 86400 * 30, // Optional: Auto-delete after 30 days
+	}
 );
 
 export const SearchStat = model<ISearchStat, SearchStatModel>(
