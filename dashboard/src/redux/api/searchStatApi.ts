@@ -46,16 +46,37 @@ export const searchStatApi = baseApi.injectEndpoints({
 			}),
 			providesTags: [tagTypes.searchStat],
 		}),
-		mySearchStat: build.query({
-			query: (filters: {
+		mySearchStat: build.query<
+			SearchStatResponse,
+			{
 				dateFilter?: string;
 				customRange?: { from: string; to: string };
 				searchFeedId?: string;
-			}) => ({
-				url: `${SEARCH_STAT_URL}/my`,
-				method: "GET",
-				params: filters,
-			}),
+				groupBy?: "hour" | "day" | "month";
+				page?: number;
+				limit?: number;
+			}
+		>({
+			query: (filters) => {
+				// Clean the filters object to remove undefined values
+				const params: Record<string, any> = {
+					...filters,
+					customRange: filters.customRange
+						? JSON.stringify(filters.customRange)
+						: undefined,
+				};
+
+				// Remove undefined parameters
+				Object.keys(params).forEach(
+					(key) => params[key] === undefined && delete params[key]
+				);
+
+				return {
+					url: `${SEARCH_STAT_URL}/my`,
+					method: "GET",
+					params, // Pass the cleaned params
+				};
+			},
 			providesTags: [tagTypes.searchStat],
 		}),
 		updateSearchStat: build.mutation({

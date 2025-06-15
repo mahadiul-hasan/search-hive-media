@@ -19,9 +19,10 @@ app.set("trust proxy", true);
 app.disable("x-powered-by");
 
 const allowedOrigins = [
-	"https://dashboard.searchhivemedia.com",
-	"https://searchhivemedia.com",
-	"https://adshuntmedia.com",
+	"http://localhost:5173",
+	// "https://dashboard.searchhivemedia.com",
+	// "https://searchhivemedia.com",
+	// "https://adshuntmedia.com",
 ];
 
 app.use(

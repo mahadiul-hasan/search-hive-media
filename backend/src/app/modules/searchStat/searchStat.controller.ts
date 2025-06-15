@@ -66,15 +66,22 @@ const getMySearchStat = catchAsync(async (req: Request, res: Response) => {
 		throw new ApiError(httpStatus.BAD_REQUEST, "User ID not found");
 	}
 
-	const { dateFilter, searchFeedId } = req.query;
+	const { dateFilter, searchFeedId, groupBy, page, limit } = req.query;
 
 	// Extract 'customRange[from]' and 'customRange[to]' explicitly
 	const from = req.query["customRange[from]"] as string | undefined;
 	const to = req.query["customRange[to]"] as string | undefined;
 
-	const filters: SearchStatFilters = {
+	const filters: SearchStatFilters & {
+		groupBy?: "hour" | "day" | "month";
+		page?: number;
+		limit?: number;
+	} = {
 		dateFilter: dateFilter as DateFilter | undefined,
 		searchFeedId: searchFeedId as string | undefined,
+		groupBy: groupBy as "hour" | "day" | "month",
+		page: page ? parseInt(page as string) : undefined,
+		limit: limit ? parseInt(limit as string) : undefined,
 		customRange:
 			dateFilter === "custom" && from && to ? { from, to } : undefined,
 	};
