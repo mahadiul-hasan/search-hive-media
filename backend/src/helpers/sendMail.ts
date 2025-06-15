@@ -3,7 +3,9 @@ import config from "../config";
 
 export const sendResetEmail = async (to: string, token: string) => {
 	const transporter = nodemailer.createTransport({
-		service: "gmail",
+		host: "mail.adshuntmedia.com",
+		port: 465,
+		secure: true,
 		auth: {
 			user: config.email,
 			pass: config.password,
@@ -35,7 +37,7 @@ export const sendResetEmail = async (to: string, token: string) => {
 
 	const mailOptions = {
 		to,
-		from: config.email,
+		from: `"Ads Hunt Media" <${config.email}>`,
 		subject: "Password Reset",
 		html,
 	};
