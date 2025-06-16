@@ -12,7 +12,7 @@ import {
 import DeleteButton from "./DeleteButton";
 import { Link } from "react-router";
 import { ISearchStat } from "@/types/searchStat";
-import { Checkbox } from "@/components/ui/Checkbox";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export const SearchStatColumns: ColumnDef<ISearchStat>[] = [
 	{
