@@ -4,11 +4,11 @@ import { useMySearchStatQuery } from "@/redux/api/searchStatApi";
 import Loader from "@/components/Loader";
 import { useMySearchFeedQuery } from "@/redux/api/searchFeedApi";
 import { SearchStatDataTable } from "@/components/app/admin/searchStat/search-stat-table";
-import { SearchStatColumns } from "@/components/app/admin/searchStat/search-stat-column";
 import { CustomPagination } from "@/components/ui/CustomPagination";
 import { Button } from "@/components/ui/button";
 import { useDebounce } from "use-debounce";
 import { Loader2 } from "lucide-react";
+import { SearchStatColumnsDashboard } from "@/components/app/admin/searchStat/search-stat-column-dashboard";
 
 type DateFilter =
 	| "today"
@@ -300,7 +300,7 @@ export default function Report() {
 			) : (
 				<>
 					<SearchStatDataTable
-						columns={SearchStatColumns}
+						columns={SearchStatColumnsDashboard}
 						data={stats}
 					/>
 					<CustomPagination
