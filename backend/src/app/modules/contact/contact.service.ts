@@ -19,7 +19,7 @@ const getAllContacts = async () => {
 	}
 	// If not in cache, fetch from MongoDB
 	const contacts = await Contact.find({}).sort({ createdAt: -1 });
-	await redisClient.set(cacheKey, JSON.stringify(contacts));
+	await redisClient.setEx(cacheKey, 86400, JSON.stringify(contacts));
 	return contacts;
 };
 

@@ -35,7 +35,7 @@ const getAllUsers = async (): Promise<IUser[]> => {
 		return JSON.parse(cachedUsers);
 	}
 	const users = await User.find().select("-password");
-	await redisClient.set(cacheKey, JSON.stringify(users));
+	await redisClient.setEx(cacheKey, 86400, JSON.stringify(users));
 	return users;
 };
 

@@ -14,6 +14,11 @@ router.patch(
 );
 
 router.delete("/:id", auth("admin"), SearchStatController.deleteSearchStat);
+router.delete(
+	"/",
+	auth("admin"),
+	SearchStatController.deleteMultipleSearchStats
+);
 
 router.get(
 	"/single/:id",

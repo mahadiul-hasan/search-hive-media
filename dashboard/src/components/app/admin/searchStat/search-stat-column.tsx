@@ -12,8 +12,33 @@ import {
 import DeleteButton from "./DeleteButton";
 import { Link } from "react-router";
 import { ISearchStat } from "@/types/searchStat";
+import { Checkbox } from "@/components/ui/Checkbox";
 
 export const SearchStatColumns: ColumnDef<ISearchStat>[] = [
+	{
+		id: "select",
+		header: ({ table }) => (
+			<Checkbox
+				checked={
+					table.getIsAllPageRowsSelected() ||
+					(table.getIsSomePageRowsSelected() && "indeterminate")
+				}
+				onCheckedChange={(value: any) =>
+					table.toggleAllPageRowsSelected(!!value)
+				}
+				aria-label="Select all"
+			/>
+		),
+		cell: ({ row }) => (
+			<Checkbox
+				checked={row.getIsSelected()}
+				onCheckedChange={(value) => row.toggleSelected(!!value)}
+				aria-label="Select row"
+			/>
+		),
+		enableSorting: false,
+		enableHiding: false,
+	},
 	{
 		accessorKey: "_id",
 		header: "ID",

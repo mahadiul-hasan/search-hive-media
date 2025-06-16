@@ -608,10 +608,27 @@ const deleteSearchStat = async (id: string) => {
 	return result;
 };
 
+const deleteMultipleSearchStats = async (ids: string[]) => {
+	const result = await SearchStat.deleteMany({ _id: { $in: ids } });
+
+	if (result.deletedCount === 0) {
+		throw new ApiError(
+			httpStatus.BAD_REQUEST,
+			"No search feeds were found or deleted"
+		);
+	}
+
+	return {
+		deletedCount: result.deletedCount,
+		deletedIds: ids,
+	};
+};
+
 export const SearchStatService = {
 	updateSearchStat,
 	getAllSearchStat,
 	getSingleSearchStat,
 	getMySearchStat,
 	deleteSearchStat,
+	deleteMultipleSearchStats,
 };

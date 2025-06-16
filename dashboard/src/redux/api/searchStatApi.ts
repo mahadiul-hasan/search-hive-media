@@ -94,6 +94,14 @@ export const searchStatApi = baseApi.injectEndpoints({
 			}),
 			invalidatesTags: [tagTypes.searchStat],
 		}),
+		deleteMultipleSearchStat: build.mutation({
+			query: (ids) => ({
+				url: `${SEARCH_STAT_URL}`,
+				method: "DELETE",
+				data: { ids },
+			}),
+			invalidatesTags: [tagTypes.searchStat],
+		}),
 	}),
 });
 
@@ -103,4 +111,5 @@ export const {
 	useMySearchStatQuery,
 	useUpdateSearchStatMutation,
 	useDeleteSearchStatMutation,
+	useDeleteMultipleSearchStatMutation,
 } = searchStatApi;

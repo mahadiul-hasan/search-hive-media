@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as React from "react";
 import {
 	ColumnDef,
@@ -20,15 +19,18 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
+import { ISearchStat } from "@/types/searchStat";
 
 interface DataTableProps<TData, TValue> {
 	columns: ColumnDef<TData, TValue>[];
 	data: TData[];
+	onSelectedIdsChange?: (ids: string[]) => void;
 }
 
 export function SearchStatDataTable<TData, TValue>({
 	columns,
 	data,
+	onSelectedIdsChange,
 }: DataTableProps<TData, TValue>) {
 	const [sorting, setSorting] = React.useState<SortingState>([]);
 	const [columnFilters, setColumnFilters] =
@@ -40,13 +42,38 @@ export function SearchStatDataTable<TData, TValue>({
 	const table = useReactTable({
 		data,
 		columns,
+		getRowId: (row) => {
+			// Use the first originalId as the row ID
+			const originalRow = row as unknown as ISearchStat;
+			return (
+				originalRow.originalIds?.[0] ||
+				Math.random().toString(36).substring(2)
+			);
+		},
+		onRowSelectionChange: (updater) => {
+			const newSelection =
+				typeof updater === "function" ? updater(rowSelection) : updater;
+			setRowSelection(newSelection);
+
+			if (onSelectedIdsChange) {
+				const selectedRowIds = Object.keys(newSelection)
+					.filter((id) => newSelection[id])
+					.map((id) => {
+						const row = table.getRow(id);
+						const originalRow =
+							row?.original as unknown as ISearchStat;
+						return originalRow?.originalIds || [];
+					})
+					.flat(); // Flatten all originalIds arrays
+				onSelectedIdsChange(selectedRowIds);
+			}
+		},
 		onSortingChange: setSorting,
 		onColumnFiltersChange: setColumnFilters,
 		getCoreRowModel: getCoreRowModel(),
 		getSortedRowModel: getSortedRowModel(),
 		getFilteredRowModel: getFilteredRowModel(),
 		onColumnVisibilityChange: setColumnVisibility,
-		onRowSelectionChange: setRowSelection,
 		state: {
 			sorting,
 			columnFilters,
@@ -55,26 +82,29 @@ export function SearchStatDataTable<TData, TValue>({
 		},
 	});
 
+	// Optional: Log selection changes for debugging
+	React.useEffect(() => {
+		console.log("Row Selection:", rowSelection);
+	}, [rowSelection]);
+
 	return (
 		<div className="w-full">
 			<div className="rounded-md border">
 				<Table>
 					<TableHeader>
-						{table.getHeaderGroups().map((headerGroup: any) => (
+						{table.getHeaderGroups().map((headerGroup) => (
 							<TableRow key={headerGroup.id}>
-								{headerGroup.headers.map((header: any) => {
-									return (
-										<TableHead key={header.id}>
-											{header.isPlaceholder
-												? null
-												: flexRender(
-														header.column.columnDef
-															.header,
-														header.getContext()
-												  )}
-										</TableHead>
-									);
-								})}
+								{headerGroup.headers.map((header) => (
+									<TableHead key={header.id}>
+										{header.isPlaceholder
+											? null
+											: flexRender(
+													header.column.columnDef
+														.header,
+													header.getContext()
+											  )}
+									</TableHead>
+								))}
 							</TableRow>
 						))}
 					</TableHeader>
@@ -84,10 +114,12 @@ export function SearchStatDataTable<TData, TValue>({
 								<TableRow
 									key={row.id}
 									data-state={
-										row.getIsSelected() && "selected"
+										row.getIsSelected()
+											? "selected"
+											: undefined
 									}
 								>
-									{row.getVisibleCells().map((cell: any) => (
+									{row.getVisibleCells().map((cell) => (
 										<TableCell key={cell.id}>
 											{flexRender(
 												cell.column.columnDef.cell,

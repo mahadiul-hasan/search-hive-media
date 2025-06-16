@@ -1,6 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
-import { useSearchStatsQuery } from "@/redux/api/searchStatApi";
+import {
+	useDeleteMultipleSearchStatMutation,
+	useSearchStatsQuery,
+} from "@/redux/api/searchStatApi";
 import Loader from "@/components/Loader";
 import { useSearchFeedsQuery } from "@/redux/api/searchFeedApi";
 import { SearchStatDataTable } from "@/components/app/admin/searchStat/search-stat-table";
@@ -8,6 +11,7 @@ import { SearchStatColumns } from "@/components/app/admin/searchStat/search-stat
 import { CustomPagination } from "@/components/ui/CustomPagination";
 import { Button } from "@/components/ui/button";
 import { useDebounce } from "use-debounce";
+import toast from "react-hot-toast";
 
 type DateFilter =
 	| "today"
@@ -130,6 +134,33 @@ export default function SearchStat() {
 
 	const handlePageChange = (newPage: number) => {
 		setPage(newPage);
+	};
+
+	const [selectedIds, setSelectedIds] = useState<string[]>([]);
+
+	const [deleteSearchStats, { isLoading: deleteLoading }] =
+		useDeleteMultipleSearchStatMutation();
+
+	const handleBulkDelete = async () => {
+		if (selectedIds.length === 0) return;
+		if (!confirm("Are you sure you want to delete selected records?")) {
+			return;
+		}
+		try {
+			// Call your delete API here with selectedIds
+			const res = await deleteSearchStats(selectedIds);
+			if ("data" in res) {
+				toast.success(res.data.message);
+				setSelectedIds([]);
+				// Optionally refresh data or handle success
+				handleFilterChange();
+			} else if ("error" in res) {
+				// @ts-expect-error since TS doesn't know the exact shape
+				toast.error(res?.error?.data || "An unknown error occurred.");
+			}
+		} catch (err: any) {
+			toast.error(err.message);
+		}
 	};
 
 	return (
@@ -281,6 +312,7 @@ export default function SearchStat() {
 					<SearchStatDataTable
 						columns={SearchStatColumns}
 						data={stats}
+						onSelectedIdsChange={setSelectedIds}
 					/>
 					<CustomPagination
 						currentPage={page}
@@ -288,6 +320,14 @@ export default function SearchStat() {
 						itemsPerPage={limit}
 						onPageChange={handlePageChange}
 					/>
+
+					{selectedIds.length > 0 && (
+						<Button onClick={handleBulkDelete}>
+							{deleteLoading
+								? "Deleting..."
+								: `Delete Selected (${selectedIds.length})`}
+						</Button>
+					)}
 				</>
 			)}
 		</div>

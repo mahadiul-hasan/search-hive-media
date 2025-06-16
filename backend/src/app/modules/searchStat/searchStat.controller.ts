@@ -107,10 +107,28 @@ const deleteSearchStat = catchAsync(async (req: Request, res: Response) => {
 	});
 });
 
+const deleteMultipleSearchStats = catchAsync(
+	async (req: Request, res: Response) => {
+		const ids = req.body.ids;
+		if (!Array.isArray(ids) || ids.length === 0) {
+			throw new ApiError(httpStatus.BAD_REQUEST, "Invalid ID list");
+		}
+
+		await SearchStatService.deleteMultipleSearchStats(ids);
+
+		sendResponse(res, {
+			statusCode: httpStatus.OK,
+			success: true,
+			message: "Search Stat deleted successfully",
+		});
+	}
+);
+
 export const SearchStatController = {
 	updateSearchStat,
 	getAllSearchStat,
 	getSingleSearchStat,
 	getMySearchStat,
 	deleteSearchStat,
+	deleteMultipleSearchStats,
 };
