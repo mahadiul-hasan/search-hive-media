@@ -110,7 +110,7 @@ const handleShortUrlClick = async (req: Request, res: Response) => {
 	);
 
 	// Step 6: Redirect
-	const key = req.query.key as string;
+	const key = req.query.query as string;
 	const redirectUrl = key
 		? `${feed.original_url.replace(/\/$/, "")}/${encodeURIComponent(key)}`
 		: feed.original_url;

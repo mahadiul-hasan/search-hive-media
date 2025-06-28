@@ -6,7 +6,7 @@ import { ISearchStat } from "@/types/searchStat";
 
 export const SearchStatColumnsDashboard: ColumnDef<ISearchStat>[] = [
 	{
-		accessorKey: "Date",
+		accessorKey: "createdAt",
 		header: ({ column }: any) => (
 			<Button
 				variant="ghost"
@@ -14,7 +14,7 @@ export const SearchStatColumnsDashboard: ColumnDef<ISearchStat>[] = [
 					column.toggleSorting(column.getIsSorted() === "asc")
 				}
 			>
-				Created At <ArrowUpDown className="ml-2 h-4 w-4" />
+				Date <ArrowUpDown className="ml-2 h-4 w-4" />
 			</Button>
 		),
 		cell: ({ row }: any) => {

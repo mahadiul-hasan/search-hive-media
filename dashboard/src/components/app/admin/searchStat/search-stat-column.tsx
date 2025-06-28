@@ -40,7 +40,7 @@ export const SearchStatColumns: ColumnDef<ISearchStat>[] = [
 		enableHiding: false,
 	},
 	{
-		accessorKey: "Date",
+		accessorKey: "createdAt",
 		header: ({ column }: any) => (
 			<Button
 				variant="ghost"
@@ -48,7 +48,7 @@ export const SearchStatColumns: ColumnDef<ISearchStat>[] = [
 					column.toggleSorting(column.getIsSorted() === "asc")
 				}
 			>
-				Created At <ArrowUpDown className="ml-2 h-4 w-4" />
+				Date <ArrowUpDown className="ml-2 h-4 w-4" />
 			</Button>
 		),
 		cell: ({ row }: any) => {
