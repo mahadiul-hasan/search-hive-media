@@ -77,10 +77,10 @@ export const SearchStatColumns: ColumnDef<ISearchStat>[] = [
 		},
 	},
 	{
-		accessorKey: "user.id",
+		accessorKey: "user.userId",
 		header: "Account",
 		cell: ({ row }: any) => (
-			<div className="text-center">{row.original.user?.id}</div>
+			<div className="text-center">{row.original.user?.userId}</div>
 		),
 	},
 	{
