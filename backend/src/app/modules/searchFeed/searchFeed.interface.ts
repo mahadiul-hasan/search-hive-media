@@ -1,6 +1,7 @@
 import { Model, Types } from "mongoose";
 
 export interface ISearchFeed extends Document {
+	feedId: string;
 	name: string;
 	search_cap: string;
 	search_engine?: "google" | "bing" | "yahoo" | "duckduckgo";

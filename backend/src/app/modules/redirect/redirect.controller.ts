@@ -48,7 +48,7 @@ const handleShortUrlClick = async (req: Request, res: Response) => {
 	const isDuplicateClick = await redisClient.get(blockKey);
 	if (isDuplicateClick) {
 		// Still redirect user, just don't update stats
-		const key = req.query.key as string;
+		const key = req.query.query as string;
 		const redirectUrl = key
 			? `${feed.original_url.replace(/\/$/, "")}/${encodeURIComponent(
 					key

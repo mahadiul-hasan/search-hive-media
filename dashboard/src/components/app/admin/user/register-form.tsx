@@ -25,6 +25,9 @@ export function RegisterForm({
 	const [createUser, { isLoading }] = useCreateUserMutation();
 	const navigate = useNavigate();
 	const formSchema = z.object({
+		id: z.string({
+			required_error: "ID is required",
+		}),
 		name: z
 			.string({
 				required_error: "Name is required",
@@ -45,6 +48,7 @@ export function RegisterForm({
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
+			id: "",
 			name: "",
 			email: "",
 			password: "",
@@ -80,6 +84,23 @@ export function RegisterForm({
 							onSubmit={form.handleSubmit(onSubmit)}
 							className="space-y-8"
 						>
+							<FormField
+								control={form.control}
+								name="id"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Id</FormLabel>
+										<FormControl>
+											<Input
+												placeholder="1234"
+												type="text"
+												{...field}
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
 							<FormField
 								control={form.control}
 								name="name"

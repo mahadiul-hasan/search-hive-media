@@ -2,6 +2,9 @@ import { z } from "zod";
 
 const create = z.object({
 	body: z.object({
+		feedId: z.string({
+			required_error: "ID is required",
+		}),
 		name: z.string({
 			required_error: "Name is required",
 		}),
@@ -30,6 +33,7 @@ const create = z.object({
 
 const update = z.object({
 	body: z.object({
+		feedId: z.string().optional(),
 		name: z.string().optional(),
 		search_cap: z.string().optional(),
 		search_engine: z

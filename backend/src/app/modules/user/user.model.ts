@@ -29,6 +29,7 @@ const PersonalDetailsSchema = new Schema({
 // User schema
 const UserSchema = new Schema<IUser, UserModel>(
 	{
+		id: { type: String, required: true, unique: true },
 		name: { type: String, required: true },
 		email: { type: String, required: true, unique: true },
 		password: { type: String, required: true },
@@ -41,10 +42,13 @@ const UserSchema = new Schema<IUser, UserModel>(
 
 UserSchema.statics.isUserExist = async function (
 	email: string
-): Promise<Pick<IUser, "_id" | "name" | "email" | "password" | "role"> | null> {
+): Promise<Pick<
+	IUser,
+	"_id" | "id" | "name" | "email" | "password" | "role"
+> | null> {
 	return await User.findOne(
 		{ email: email },
-		{ _id: 1, name: 1, email: 1, password: 1, role: 1 }
+		{ _id: 1, id: 1, name: 1, email: 1, password: 1, role: 1 }
 	).lean();
 };
 

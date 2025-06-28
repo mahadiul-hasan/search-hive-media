@@ -2,6 +2,7 @@ import { z } from "zod";
 
 const register = z.object({
 	body: z.object({
+		id: z.string({ required_error: "ID is required" }).min(1).max(50),
 		name: z.string({ required_error: "Name is required" }).min(1).max(50),
 		email: z.string({ required_error: "Email is required" }).email(),
 		password: z.string().min(6, {
@@ -12,6 +13,7 @@ const register = z.object({
 
 const update = z.object({
 	body: z.object({
+		id: z.string().optional(),
 		name: z.string().optional(),
 		email: z.string().email().optional(),
 		role: z.enum(["admin", "user"]).optional(),

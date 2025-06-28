@@ -57,6 +57,7 @@ export function UpdateSearchFeedForm({
 		useUpdateSearchFeedMutation();
 
 	const formSchema = z.object({
+		feedId: z.string().optional(),
 		name: z.string().optional(),
 		search_cap: z.string().optional(),
 		search_engine: z
@@ -75,6 +76,7 @@ export function UpdateSearchFeedForm({
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
+			feedId: "",
 			name: "",
 			search_cap: "",
 			search_engine: "google",
@@ -92,6 +94,7 @@ export function UpdateSearchFeedForm({
 	useEffect(() => {
 		if (searchFeed) {
 			form.reset({
+				feedId: searchFeed.feedId || "",
 				name: searchFeed.name || "",
 				search_cap: searchFeed.search_cap || "",
 				search_engine: searchFeed.search_engine || "google",
@@ -149,13 +152,13 @@ export function UpdateSearchFeedForm({
 								<div className="flex flex-col md:flex-row gap-4">
 									<FormField
 										control={form.control}
-										name="name"
+										name="feedId"
 										render={({ field }) => (
 											<FormItem className="w-full">
-												<FormLabel>Name</FormLabel>
+												<FormLabel>Feed Id</FormLabel>
 												<FormControl>
 													<Input
-														placeholder="Enter full name"
+														placeholder="Enter feed id"
 														type="text"
 														{...field}
 													/>
@@ -164,6 +167,25 @@ export function UpdateSearchFeedForm({
 											</FormItem>
 										)}
 									/>
+									<FormField
+										control={form.control}
+										name="name"
+										render={({ field }) => (
+											<FormItem className="w-full">
+												<FormLabel>Name</FormLabel>
+												<FormControl>
+													<Input
+														placeholder="Enter feed name"
+														type="text"
+														{...field}
+													/>
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+								</div>
+								<div className="flex flex-col md:flex-row gap-4">
 									<FormField
 										control={form.control}
 										name="search_cap"
@@ -183,22 +205,20 @@ export function UpdateSearchFeedForm({
 											</FormItem>
 										)}
 									/>
-								</div>
-								<div className="flex flex-col md:flex-row gap-4">
 									<CustomSelect
 										label="Search Engine"
 										name="search_engine"
 										form={form}
 										options={searchEngineOption}
 									/>
+								</div>
+								<div className="flex flex-col md:flex-row gap-4">
 									<CustomSelect
 										label="Status"
 										name="status"
 										form={form}
 										options={statusOption}
 									/>
-								</div>
-								<div className="flex flex-col md:flex-row gap-4">
 									<FormField
 										control={form.control}
 										name="tid_level"
@@ -216,6 +236,8 @@ export function UpdateSearchFeedForm({
 											</FormItem>
 										)}
 									/>
+								</div>
+								<div className="flex flex-col md:flex-row gap-4">
 									<FormField
 										control={form.control}
 										name="type_integration"
@@ -235,8 +257,6 @@ export function UpdateSearchFeedForm({
 											</FormItem>
 										)}
 									/>
-								</div>
-								<div className="flex flex-col md:flex-row gap-4">
 									<FormField
 										control={form.control}
 										name="type_search"
@@ -256,6 +276,8 @@ export function UpdateSearchFeedForm({
 											</FormItem>
 										)}
 									/>
+								</div>
+								<div className="flex flex-col md:flex-row gap-4">
 									<FormField
 										control={form.control}
 										name="type_traffic"
@@ -275,8 +297,6 @@ export function UpdateSearchFeedForm({
 											</FormItem>
 										)}
 									/>
-								</div>
-								<div className="flex flex-col md:flex-row gap-4">
 									<FormField
 										control={form.control}
 										name="original_url"
@@ -296,19 +316,18 @@ export function UpdateSearchFeedForm({
 											</FormItem>
 										)}
 									/>
+								</div>
+								<div className="flex flex-col md:flex-row gap-4">
 									<MultiSelect
 										label="Countries"
 										name="countries"
 										form={form}
 										options={countryOptions}
 									/>
-								</div>
-								<div>
 									<CustomSelect
 										label="User"
 										name="user"
 										form={form}
-										data={searchFeed.user}
 										options={userOptions}
 									/>
 								</div>

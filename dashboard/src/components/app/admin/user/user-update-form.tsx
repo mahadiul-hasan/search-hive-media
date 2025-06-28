@@ -41,6 +41,7 @@ export function UpdateUserForm({
 
 	// const navigate = useNavigate();
 	const formSchema = z.object({
+		id: z.string().optional(),
 		name: z.string().optional(),
 		email: z.string().email().optional(),
 		role: z.string().optional(),
@@ -72,6 +73,7 @@ export function UpdateUserForm({
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
+			id: "",
 			name: "",
 			email: "",
 			role: "",
@@ -100,6 +102,7 @@ export function UpdateUserForm({
 	useEffect(() => {
 		if (user) {
 			form.reset({
+				id: user.id || "",
 				name: user.name || "",
 				email: user.email || "",
 				role: user.role || "",
@@ -457,6 +460,23 @@ export function UpdateUserForm({
 												<FormControl>
 													<Input
 														placeholder="Enter account detail"
+														type="text"
+														{...field}
+													/>
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+								</div>
+								<div className="flex flex-col md:flex-row gap-4">
+									<FormField
+										control={form.control}
+										name="id"
+										render={({ field }) => (
+											<FormItem className="w-full hidden">
+												<FormControl>
+													<Input
 														type="text"
 														{...field}
 													/>

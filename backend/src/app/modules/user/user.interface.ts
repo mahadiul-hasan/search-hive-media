@@ -7,6 +7,7 @@ export enum Role {
 
 export interface IUser extends Document {
 	_id?: string;
+	id: string;
 	name: string;
 	email: string;
 	password: string;
@@ -35,7 +36,9 @@ export interface IUser extends Document {
 export type UserModel = {
 	isUserExist(
 		email: string
-	): Promise<Pick<IUser, "_id" | "name" | "email" | "password" | "role">>;
+	): Promise<
+		Pick<IUser, "_id" | "id" | "name" | "email" | "password" | "role">
+	>;
 	isPasswordMatch(
 		currentPassword: string,
 		savedPassword: string

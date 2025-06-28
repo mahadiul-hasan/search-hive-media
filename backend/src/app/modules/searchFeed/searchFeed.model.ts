@@ -3,6 +3,7 @@ import { ISearchFeed, SearchFeedModel } from "./searchFeed.interface";
 
 const SearchFeedSchema = new Schema<ISearchFeed, SearchFeedModel>(
 	{
+		feedId: { type: String, required: true, unique: true },
 		name: { type: String, required: true },
 		search_cap: { type: String, required: true },
 		search_engine: {

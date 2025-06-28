@@ -7,17 +7,17 @@ import { GetShortUrl } from "./GetShortUrl";
 
 export const UserSearchFeedColumns: ColumnDef<ISearchFeedUser>[] = [
 	{
-		accessorKey: "_id",
-		header: "Id",
+		accessorKey: "user.id",
+		header: "Account",
 		cell: ({ row }: any) => (
-			<div className="capitalize">{row.getValue("_id")}</div>
+			<div className="capitalize">{row.original.user.id}</div>
 		),
 	},
 	{
-		accessorKey: "user.name",
-		header: "User",
+		accessorKey: "feedId",
+		header: "Feed Id",
 		cell: ({ row }: any) => (
-			<div className="capitalize">{row.original.user.name}</div>
+			<div className="capitalize">{row.getValue("feedId")}</div>
 		),
 	},
 	{

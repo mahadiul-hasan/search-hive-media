@@ -12,25 +12,26 @@ import {
 import DeleteButton from "./DeleteButton";
 import { Link } from "react-router";
 import { ISearchFeed } from "@/types/searchFeed";
+import { GetShortUrl } from "../../user/searchFeed/GetShortUrl";
 
 export const SearchFeedColumns: ColumnDef<ISearchFeed>[] = [
 	{
-		accessorKey: "_id",
-		header: "Id",
+		accessorKey: "user.id",
+		header: "Account",
 		cell: ({ row }: any) => (
-			<div className="capitalize">{row.getValue("_id")}</div>
+			<div className="capitalize">{row.original.user.id}</div>
 		),
 	},
 	{
-		accessorKey: "user.name",
-		header: "User",
+		accessorKey: "feedId",
+		header: "Feed Id",
 		cell: ({ row }: any) => (
-			<div className="capitalize">{row.original.user.name}</div>
+			<div className="capitalize">{row.getValue("feedId")}</div>
 		),
 	},
 	{
 		accessorKey: "name",
-		header: "Feed Name",
+		header: "Name",
 		cell: ({ row }: any) => (
 			<div className="capitalize">{row.getValue("name")}</div>
 		),
@@ -116,6 +117,13 @@ export const SearchFeedColumns: ColumnDef<ISearchFeed>[] = [
 
 			return <div>{formattedDate}</div>;
 		},
+	},
+	{
+		accessorKey: "short_url",
+		header: () => <div className="text-right">Endpoint</div>,
+		cell: ({ row }: any) => (
+			<GetShortUrl shortUrl={row.getValue("short_url")} />
+		),
 	},
 	{
 		id: "actions",

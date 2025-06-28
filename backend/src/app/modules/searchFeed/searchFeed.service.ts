@@ -92,12 +92,10 @@ const updateSearchFeed = async (data: Partial<ISearchFeed>, id: string) => {
 };
 
 const getAllSearchFeed = async () => {
-	const result = await SearchFeed.find({})
-		.populate({
-			path: "user",
-			select: "-password",
-		})
-		.select("-short_url");
+	const result = await SearchFeed.find({}).populate({
+		path: "user",
+		select: "-password",
+	});
 
 	return result;
 };
@@ -113,7 +111,7 @@ const getSingleSearchFeed = async (id: string) => {
 };
 
 const getMySearchFeed = async (id: string) => {
-	const result = await SearchFeed.find({ user: id, status: "active" })
+	const result = await SearchFeed.find({ user: id })
 		.populate({
 			path: "user",
 			select: "-password",

@@ -1,38 +1,57 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "../../../ui/button";
-import { ArrowUpDown, MoreHorizontal } from "lucide-react";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuLabel,
-	DropdownMenuTrigger,
-} from "../../../ui/dropdown-menu";
-import DeleteButton from "./DeleteButton";
-import { Link } from "react-router";
+import { ArrowUpDown } from "lucide-react";
 import { ISearchStat } from "@/types/searchStat";
 
 export const SearchStatColumnsDashboard: ColumnDef<ISearchStat>[] = [
 	{
-		accessorKey: "_id",
-		header: "ID",
-		cell: ({ row }) => (
-			<div className="text-center text-sm font-mono">
-				{row.original.originalIds?.[0] || "N/A"}
-			</div>
+		accessorKey: "Date",
+		header: ({ column }: any) => (
+			<Button
+				variant="ghost"
+				onClick={() =>
+					column.toggleSorting(column.getIsSorted() === "asc")
+				}
+			>
+				Created At <ArrowUpDown className="ml-2 h-4 w-4" />
+			</Button>
 		),
+		cell: ({ row }: any) => {
+			const date = new Date(row.getValue("createdAt"));
+			const formatted = new Intl.DateTimeFormat("en-US", {
+				year: "numeric",
+				month: "short",
+				day: "numeric",
+			}).format(date);
+			return <div>{formatted}</div>;
+		},
+		filterFn: (row, columnId, filterValue: string) => {
+			const rowDate = new Date(row.getValue(columnId));
+			const selectedDate = new Date(filterValue);
+
+			// Format using local date instead of UTC
+			const formatDateLocal = (date: Date) =>
+				`${date.getFullYear()}-${(date.getMonth() + 1)
+					.toString()
+					.padStart(2, "0")}-${date
+					.getDate()
+					.toString()
+					.padStart(2, "0")}`;
+
+			return formatDateLocal(rowDate) === formatDateLocal(selectedDate);
+		},
 	},
 	{
-		accessorKey: "user.name",
-		header: "User",
+		accessorKey: "user.id",
+		header: "Account",
 		cell: ({ row }: any) => (
-			<div className="text-center">{row.original.user?.name}</div>
+			<div className="text-center">{row.original.user?.id}</div>
 		),
 	},
 	{
 		accessorKey: "searchFeed.name",
-		header: "Feed Name",
+		header: "Link Name",
 		cell: ({ row }: any) => (
 			<div className="text-center">{row.original.searchFeed?.name}</div>
 		),
@@ -120,111 +139,5 @@ export const SearchStatColumnsDashboard: ColumnDef<ISearchStat>[] = [
 		cell: ({ row }: any) => (
 			<div className="text-center">{row.getValue("revenue")}</div>
 		),
-	},
-	{
-		accessorKey: "ip",
-		header: "IP",
-		cell: ({ row }: any) => (
-			<div className="text-center">{row.getValue("ip")}</div>
-		),
-	},
-	{
-		accessorKey: "os",
-		header: "OS",
-		cell: ({ row }: any) => (
-			<div className="text-center">{row.getValue("os")}</div>
-		),
-	},
-	{
-		accessorKey: "browser",
-		header: "Browser",
-		cell: ({ row }: any) => (
-			<div className="text-center">{row.getValue("browser")}</div>
-		),
-	},
-	{
-		accessorKey: "device",
-		header: "Device",
-		cell: ({ row }: any) => (
-			<div className="text-center">{row.getValue("device")}</div>
-		),
-	},
-	{
-		accessorKey: "domain",
-		header: "Domain",
-		cell: ({ row }: any) => (
-			<div className="text-center">{row.getValue("domain")}</div>
-		),
-	},
-	{
-		accessorKey: "keyword",
-		header: "Keyword",
-		cell: ({ row }: any) => (
-			<div className="text-center">{row.getValue("keyword")}</div>
-		),
-	},
-	{
-		accessorKey: "createdAt",
-		header: ({ column }: any) => (
-			<Button
-				variant="ghost"
-				onClick={() =>
-					column.toggleSorting(column.getIsSorted() === "asc")
-				}
-			>
-				Created At <ArrowUpDown className="ml-2 h-4 w-4" />
-			</Button>
-		),
-		cell: ({ row }: any) => {
-			const date = new Date(row.getValue("createdAt"));
-			const formatted = new Intl.DateTimeFormat("en-US", {
-				year: "numeric",
-				month: "short",
-				day: "numeric",
-			}).format(date);
-			return <div>{formatted}</div>;
-		},
-		filterFn: (row, columnId, filterValue: string) => {
-			const rowDate = new Date(row.getValue(columnId));
-			const selectedDate = new Date(filterValue);
-
-			// Format using local date instead of UTC
-			const formatDateLocal = (date: Date) =>
-				`${date.getFullYear()}-${(date.getMonth() + 1)
-					.toString()
-					.padStart(2, "0")}-${date
-					.getDate()
-					.toString()
-					.padStart(2, "0")}`;
-
-			return formatDateLocal(rowDate) === formatDateLocal(selectedDate);
-		},
-	},
-	{
-		id: "actions",
-		header: "Actions",
-		cell: ({ row }: any) => {
-			const stat = row.original;
-			return (
-				<DropdownMenu>
-					<DropdownMenuTrigger asChild>
-						<Button variant="ghost" className="h-8 w-8 p-0">
-							<MoreHorizontal />
-						</Button>
-					</DropdownMenuTrigger>
-					<DropdownMenuContent align="end">
-						<DropdownMenuLabel>Actions</DropdownMenuLabel>
-						<DropdownMenuItem>
-							<Link to={`/admin/update-search-stat/${stat._id}`}>
-								Edit
-							</Link>
-						</DropdownMenuItem>
-						<DropdownMenuItem className="cursor-pointer">
-							<DeleteButton id={stat._id} />
-						</DropdownMenuItem>
-					</DropdownMenuContent>
-				</DropdownMenu>
-			);
-		},
 	},
 ];

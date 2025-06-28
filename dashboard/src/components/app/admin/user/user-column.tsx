@@ -15,10 +15,10 @@ import { Link } from "react-router";
 
 export const UserColumns: ColumnDef<IUser>[] = [
 	{
-		accessorKey: "_id",
+		accessorKey: "id",
 		header: "Id",
 		cell: ({ row }: any) => (
-			<div className="capitalize">{row.getValue("_id")}</div>
+			<div className="capitalize">{row.getValue("id")}</div>
 		),
 	},
 	{
