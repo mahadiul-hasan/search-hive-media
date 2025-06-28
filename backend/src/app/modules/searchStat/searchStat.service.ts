@@ -165,7 +165,7 @@ const getAllSearchStat = async (
 			},
 		},
 		{ $unwind: { path: "$userData", preserveNullAndEmptyArrays: true } },
-		{ $addFields: { userName: "$userData.name" } }
+		{ $addFields: { userId: "$userData.id" } }
 	);
 
 	// 4. Lookup for searchFeed name
@@ -222,7 +222,7 @@ const getAllSearchStat = async (
 					},
 				},
 				searchFeed: "$searchFeed",
-				user: "$user.id",
+				user: "$user",
 			},
 			originalIds: { $push: "$originalId" },
 			searches: { $sum: "$searches" },
@@ -238,7 +238,7 @@ const getAllSearchStat = async (
 			coverage: { $avg: "$coverage" },
 			epc: { $avg: "$epc" },
 			rpm: { $avg: "$rpm" },
-			userName: { $first: "$userName" },
+			userId: { $first: "$userId" },
 			searchFeedName: { $first: "$searchFeedName" },
 		},
 	};
@@ -264,7 +264,7 @@ const getAllSearchStat = async (
 		rpm: 1,
 		user: {
 			_id: "$_id.user",
-			name: "$userName",
+			userId: "$userId",
 		},
 		searchFeed: {
 			_id: "$_id.searchFeed",
@@ -455,6 +455,20 @@ const getMySearchStat = async (
 		},
 	});
 
+	// 3. Lookup for user id
+	pipeline.push(
+		{
+			$lookup: {
+				from: "users",
+				localField: "user",
+				foreignField: "_id",
+				as: "userData",
+			},
+		},
+		{ $unwind: { path: "$userData", preserveNullAndEmptyArrays: true } },
+		{ $addFields: { userId: "$userData.id" } }
+	);
+
 	// 4. Lookup for searchFeed name
 	pipeline.push(
 		{
@@ -509,7 +523,7 @@ const getMySearchStat = async (
 					},
 				},
 				searchFeed: "$searchFeed",
-				user: "$user.id",
+				user: "$user",
 			},
 			originalIds: { $push: "$originalId" },
 			searches: { $sum: "$searches" },
@@ -525,6 +539,7 @@ const getMySearchStat = async (
 			coverage: { $avg: "$coverage" },
 			epc: { $avg: "$epc" },
 			rpm: { $avg: "$rpm" },
+			userId: { $first: "$userId" },
 			searchFeedName: { $first: "$searchFeedName" },
 		},
 	};
@@ -548,7 +563,10 @@ const getMySearchStat = async (
 		coverage: 1,
 		epc: 1,
 		rpm: 1,
-		user: "$_id.user",
+		user: {
+			_id: "$_id.user",
+			userId: "$userId",
+		},
 		searchFeed: {
 			_id: "$_id.searchFeed",
 			name: "$searchFeedName",
