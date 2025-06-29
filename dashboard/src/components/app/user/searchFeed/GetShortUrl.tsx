@@ -15,7 +15,7 @@ interface ShortUrlCellProps {
 }
 
 export function GetShortUrl({ shortUrl }: ShortUrlCellProps) {
-	const fullUrl = `https:/api.searchhivemedia.com/${shortUrl}?query=[query]`;
+	const fullUrl = `https://api.searchhivemedia.com/${shortUrl}?query=[query]`;
 	const [copied, setCopied] = useState(false);
 
 	const handleCopy = async () => {
