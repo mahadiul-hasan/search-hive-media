@@ -46,31 +46,25 @@ const handleShortUrlClick = async (req: Request, res: Response) => {
 	// Step 2: Block duplicate IP click within 5s window
 	const blockKey = `click_limit:${shortUrl}:${userIp}`;
 	const isDuplicateClick = await redisClient.get(blockKey);
+	const key = req.query.query as string;
+	const redirectUrl = key
+		? `${feed.original_url.replace(/\/$/, "")}/${encodeURIComponent(key)}`
+		: feed.original_url;
+
 	if (isDuplicateClick) {
-		const key = req.query.query as string;
-		const redirectUrl = key
-			? `${feed.original_url.replace(/\/$/, "")}/${encodeURIComponent(
-					key
-			  )}`
-			: feed.original_url;
 		return res.redirect(redirectUrl);
 	}
 	await redisClient.setEx(blockKey, 5, "1");
 
-	// Step 3: Time window for DAILY stats (Asia/Dhaka)
+	// Step 3: Hourly timestamp (Asia/Dhaka)
 	const TIMEZONE = "Asia/Dhaka";
-	const nowBD = moment().tz(TIMEZONE);
-	const dayFormat = nowBD.format("YYYY-MM-DD");
-	const dayStart = moment
-		.tz(dayFormat, "YYYY-MM-DD", TIMEZONE)
-		.startOf("day")
-		.toDate();
-	const dayEnd = moment(dayStart).add(1, "day").toDate();
+	const now = moment().tz(TIMEZONE);
+	const hourStart = now.startOf("hour").toDate();
 
 	let stat = await SearchStat.findOne({
 		searchFeed: feed._id,
 		user: feed.user,
-		createdAt: { $gte: dayStart, $lt: dayEnd },
+		createdAt: hourStart,
 	});
 
 	if (!stat) {
@@ -82,16 +76,16 @@ const handleShortUrlClick = async (req: Request, res: Response) => {
 			mistake: 0,
 			visitors: 0,
 			unique_ips: 0,
-			createdAt: dayStart,
+			createdAt: hourStart,
 		});
 		await stat.save();
 	}
 
-	// Step 4: Unique IP tracking per day
+	// Step 4: Unique IP tracking
 	const ipKey = `unique_ips:${stat._id.toString()}`;
 	const isNewIp = await redisClient.sAdd(ipKey, userIp);
 	if (isNewIp === 1) {
-		await redisClient.expire(ipKey, 86400); // expire in 1 day
+		await redisClient.expire(ipKey, 3600); // 1 hour expiry
 	}
 
 	// Step 5: Update stat
@@ -109,11 +103,6 @@ const handleShortUrlClick = async (req: Request, res: Response) => {
 	);
 
 	// Step 6: Redirect
-	const key = req.query.query as string;
-	const redirectUrl = key
-		? `${feed.original_url.replace(/\/$/, "")}/${encodeURIComponent(key)}`
-		: feed.original_url;
-
 	res.redirect(redirectUrl);
 };
 
