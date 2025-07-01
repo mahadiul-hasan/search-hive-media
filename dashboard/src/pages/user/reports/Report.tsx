@@ -57,13 +57,13 @@ export default function Report() {
 		from: "",
 		to: "",
 		searchFeedId: "",
-		groupBy: "hour",
+		groupBy: "day",
 	});
 
 	const [appliedFilters, setAppliedFilters] = useState<AppliedFilters>({
 		dateFilter: "today",
 		searchFeedId: "",
-		groupBy: "hour",
+		groupBy: "day",
 	});
 	const [isApplyingFilters, setIsApplyingFilters] = useState(false);
 
@@ -121,12 +121,12 @@ export default function Report() {
 			from: "",
 			to: "",
 			searchFeedId: "",
-			groupBy: "hour",
+			groupBy: "day",
 		});
 		setAppliedFilters({
 			dateFilter: "today",
 			searchFeedId: "",
-			groupBy: "hour",
+			groupBy: "day",
 		});
 		setPage(1);
 	};

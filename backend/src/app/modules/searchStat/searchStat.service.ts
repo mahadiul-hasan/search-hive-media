@@ -87,7 +87,7 @@ const getAllSearchStat = async (
 		dateFilter = "today",
 		customRange = {} as { from?: string; to?: string },
 		searchFeedId,
-		groupBy = "day",
+		groupBy = "hour",
 		page = 1,
 		limit = 10,
 	} = filters;
@@ -227,7 +227,7 @@ const getAllSearchStat = async (
 		groupBy as any
 	)
 		? (groupBy as "hour" | "day" | "month")
-		: "day";
+		: "hour";
 
 	let groupDateFormat;
 	switch (validGroupBy) {
