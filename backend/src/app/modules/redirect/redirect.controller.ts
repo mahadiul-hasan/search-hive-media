@@ -47,7 +47,6 @@ const handleShortUrlClick = async (req: Request, res: Response) => {
 	const blockKey = `click_limit:${shortUrl}:${userIp}`;
 	const isDuplicateClick = await redisClient.get(blockKey);
 	if (isDuplicateClick) {
-		// Still redirect user, just don't update stats
 		const key = req.query.query as string;
 		const redirectUrl = key
 			? `${feed.original_url.replace(/\/$/, "")}/${encodeURIComponent(
@@ -56,22 +55,22 @@ const handleShortUrlClick = async (req: Request, res: Response) => {
 			: feed.original_url;
 		return res.redirect(redirectUrl);
 	}
-	// Set 5s block window
 	await redisClient.setEx(blockKey, 5, "1");
 
-	// Step 3: Time window for hourly stats (Asia/Dhaka)
+	// Step 3: Time window for DAILY stats (Asia/Dhaka)
 	const TIMEZONE = "Asia/Dhaka";
 	const nowBD = moment().tz(TIMEZONE);
-	const hourFormat = nowBD.format("YYYY-MM-DD HH:00");
-	const hourStart = moment
-		.tz(hourFormat, "YYYY-MM-DD HH:00", TIMEZONE)
+	const dayFormat = nowBD.format("YYYY-MM-DD");
+	const dayStart = moment
+		.tz(dayFormat, "YYYY-MM-DD", TIMEZONE)
+		.startOf("day")
 		.toDate();
-	const hourEnd = moment(hourStart).add(1, "hour").toDate();
+	const dayEnd = moment(dayStart).add(1, "day").toDate();
 
 	let stat = await SearchStat.findOne({
 		searchFeed: feed._id,
 		user: feed.user,
-		createdAt: { $gte: hourStart, $lt: hourEnd },
+		createdAt: { $gte: dayStart, $lt: dayEnd },
 	});
 
 	if (!stat) {
@@ -83,16 +82,16 @@ const handleShortUrlClick = async (req: Request, res: Response) => {
 			mistake: 0,
 			visitors: 0,
 			unique_ips: 0,
-			createdAt: hourStart,
+			createdAt: dayStart,
 		});
 		await stat.save();
 	}
 
-	// Step 4: Unique IP tracking
+	// Step 4: Unique IP tracking per day
 	const ipKey = `unique_ips:${stat._id.toString()}`;
 	const isNewIp = await redisClient.sAdd(ipKey, userIp);
 	if (isNewIp === 1) {
-		await redisClient.expire(ipKey, 3600); // expire in 1 hour
+		await redisClient.expire(ipKey, 86400); // expire in 1 day
 	}
 
 	// Step 5: Update stat

@@ -23,6 +23,40 @@ const updateSearchStat = async (data: Partial<ISearchStat>, id: string) => {
 		);
 	}
 
+	const TIMEZONE = "Asia/Dhaka";
+
+	// Detect granularity from existing.createdAt
+	const createdAtMoment = moment(existing.createdAt).tz(TIMEZONE);
+	let groupBy: "hour" | "day" | "month" = "day";
+
+	if (
+		createdAtMoment.hour() !== 0 ||
+		createdAtMoment.minute() !== 0 ||
+		createdAtMoment.second() !== 0
+	) {
+		groupBy = "hour";
+	} else if (createdAtMoment.date() !== 1) {
+		groupBy = "day";
+	} else {
+		groupBy = "month";
+	}
+
+	// Adjust new createdAt to match detected granularity
+	if (data.createdAt) {
+		const m = moment(data.createdAt).tz(TIMEZONE);
+		switch (groupBy) {
+			case "hour":
+				data.createdAt = m.startOf("hour").toDate();
+				break;
+			case "day":
+				data.createdAt = m.startOf("day").toDate();
+				break;
+			case "month":
+				data.createdAt = m.startOf("month").toDate();
+				break;
+		}
+	}
+
 	const updated = await SearchStat.findByIdAndUpdate(id, data, { new: true })
 		.select("-short_url")
 		.populate({
