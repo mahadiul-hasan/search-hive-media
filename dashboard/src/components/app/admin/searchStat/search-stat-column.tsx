@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "../../../ui/button";
-import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import { MoreHorizontal } from "lucide-react";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -40,41 +40,11 @@ export const SearchStatColumns: ColumnDef<ISearchStat>[] = [
 		enableHiding: false,
 	},
 	{
-		accessorKey: "createdAt",
-		header: ({ column }: any) => (
-			<Button
-				variant="ghost"
-				onClick={() =>
-					column.toggleSorting(column.getIsSorted() === "asc")
-				}
-			>
-				Date <ArrowUpDown className="ml-2 h-4 w-4" />
-			</Button>
+		accessorKey: "date",
+		header: "Date",
+		cell: ({ row }: any) => (
+			<div className="text-center">{row.original.date}</div>
 		),
-		cell: ({ row }: any) => {
-			const date = new Date(row.getValue("createdAt"));
-			const formatted = new Intl.DateTimeFormat("en-US", {
-				year: "numeric",
-				month: "short",
-				day: "numeric",
-			}).format(date);
-			return <div>{formatted}</div>;
-		},
-		filterFn: (row, columnId, filterValue: string) => {
-			const rowDate = new Date(row.getValue(columnId));
-			const selectedDate = new Date(filterValue);
-
-			// Format using local date instead of UTC
-			const formatDateLocal = (date: Date) =>
-				`${date.getFullYear()}-${(date.getMonth() + 1)
-					.toString()
-					.padStart(2, "0")}-${date
-					.getDate()
-					.toString()
-					.padStart(2, "0")}`;
-
-			return formatDateLocal(rowDate) === formatDateLocal(selectedDate);
-		},
 	},
 	{
 		accessorKey: "user.userId",
