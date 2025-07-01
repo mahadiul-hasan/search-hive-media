@@ -60,13 +60,13 @@ export default function SearchStat() {
 		from: "",
 		to: "",
 		searchFeedId: "",
-		groupBy: "day",
+		groupBy: "hour",
 	});
 
 	const [appliedFilters, setAppliedFilters] = useState<AppliedFilters>({
 		dateFilter: "today",
 		searchFeedId: "",
-		groupBy: "day",
+		groupBy: "hour",
 	});
 
 	const [page, setPage] = useState(1);
@@ -122,12 +122,12 @@ export default function SearchStat() {
 			from: "",
 			to: "",
 			searchFeedId: "",
-			groupBy: "day",
+			groupBy: "hour",
 		});
 		setAppliedFilters({
 			dateFilter: "today",
 			searchFeedId: "",
-			groupBy: "day",
+			groupBy: "hour",
 		});
 		setPage(1);
 	};

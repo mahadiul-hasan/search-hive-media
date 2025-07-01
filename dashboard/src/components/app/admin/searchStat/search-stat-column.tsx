@@ -189,12 +189,14 @@ export const SearchStatColumns: ColumnDef<ISearchStat>[] = [
 					<DropdownMenuContent align="end">
 						<DropdownMenuLabel>Actions</DropdownMenuLabel>
 						<DropdownMenuItem>
-							<Link to={`/admin/update-search-stat/${stat._id}`}>
+							<Link
+								to={`/admin/update-search-stat/${stat.originalIds}`}
+							>
 								Edit
 							</Link>
 						</DropdownMenuItem>
 						<DropdownMenuItem className="cursor-pointer">
-							<DeleteButton id={stat._id} />
+							<DeleteButton id={stat.originalIds} />
 						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>
