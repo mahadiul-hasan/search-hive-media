@@ -25,13 +25,13 @@ const getAllSearchStat = catchAsync(async (req: Request, res: Response) => {
 	const to = req.query["customRange[to]"] as string | undefined;
 
 	const filters: SearchStatFilters & {
-		groupBy?: "hour" | "day" | "month";
+		groupBy?: "day" | "month";
 		page?: number;
 		limit?: number;
 	} = {
 		dateFilter: dateFilter as DateFilter | undefined,
 		searchFeedId: searchFeedId as string | undefined,
-		groupBy: groupBy as "hour" | "day" | "month",
+		groupBy: groupBy as "day" | "month",
 		page: page ? parseInt(page as string) : undefined,
 		limit: limit ? parseInt(limit as string) : undefined,
 		customRange:
@@ -73,13 +73,13 @@ const getMySearchStat = catchAsync(async (req: Request, res: Response) => {
 	const to = req.query["customRange[to]"] as string | undefined;
 
 	const filters: SearchStatFilters & {
-		groupBy?: "hour" | "day" | "month";
+		groupBy?: "day" | "month";
 		page?: number;
 		limit?: number;
 	} = {
 		dateFilter: dateFilter as DateFilter | undefined,
 		searchFeedId: searchFeedId as string | undefined,
-		groupBy: groupBy as "hour" | "day" | "month",
+		groupBy: groupBy as "day" | "month",
 		page: page ? parseInt(page as string) : undefined,
 		limit: limit ? parseInt(limit as string) : undefined,
 		customRange:
