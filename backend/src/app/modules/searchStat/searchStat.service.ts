@@ -73,7 +73,7 @@ const updateSearchStat = async (data: Partial<ISearchStat>, id: string) => {
 
 const getAllSearchStat = async (
 	filters: SearchStatFilters & {
-		groupBy?: "hour" | "day" | "month";
+		groupBy?: "day" | "month";
 		page?: number;
 		limit?: number;
 	}
@@ -87,7 +87,7 @@ const getAllSearchStat = async (
 		dateFilter = "today",
 		customRange = {} as { from?: string; to?: string },
 		searchFeedId,
-		groupBy = "hour",
+		groupBy = "day",
 		page = 1,
 		limit = 10,
 	} = filters;
@@ -222,18 +222,16 @@ const getAllSearchStat = async (
 	);
 
 	// 5. Determine date format based on groupBy
-	const allowedGroupBy = ["hour", "day", "month"] as const;
-	const validGroupBy: "hour" | "day" | "month" = allowedGroupBy.includes(
+	// 5. Determine date format based on groupBy
+	const allowedGroupBy = ["day", "month"] as const;
+	const validGroupBy: "day" | "month" = allowedGroupBy.includes(
 		groupBy as any
 	)
-		? (groupBy as "hour" | "day" | "month")
-		: "hour";
+		? (groupBy as "day" | "month")
+		: "day";
 
 	let groupDateFormat;
 	switch (validGroupBy) {
-		case "hour":
-			groupDateFormat = "%Y-%m-%d %H:00";
-			break;
 		case "day":
 			groupDateFormat = "%Y-%m-%d";
 			break;
@@ -241,7 +239,7 @@ const getAllSearchStat = async (
 			groupDateFormat = "%Y-%m";
 			break;
 		default:
-			groupDateFormat = "%Y-%m-%d %H:00";
+			groupDateFormat = "%Y-%m-%d";
 	}
 
 	// Grouping stage with dynamic date format
@@ -370,7 +368,7 @@ const getSingleSearchStat = async (id: string) => {
 
 const getMySearchStat = async (
 	filters: SearchStatFilters & {
-		groupBy?: "hour" | "day" | "month";
+		groupBy?: "day" | "month";
 		page?: number;
 		limit?: number;
 	},
@@ -391,7 +389,7 @@ const getMySearchStat = async (
 	} = filters;
 
 	const query: any = {
-		user: new Types.ObjectId(userId), // ensure proper type
+		user: new Types.ObjectId(userId),
 	};
 
 	let startDate: Date | undefined;
@@ -523,18 +521,15 @@ const getMySearchStat = async (
 	);
 
 	// 5. Determine date format based on groupBy
-	const allowedGroupBy = ["hour", "day", "month"] as const;
-	const validGroupBy: "hour" | "day" | "month" = allowedGroupBy.includes(
+	const allowedGroupBy = ["day", "month"] as const;
+	const validGroupBy: "day" | "month" = allowedGroupBy.includes(
 		groupBy as any
 	)
-		? (groupBy as "hour" | "day" | "month")
+		? (groupBy as "day" | "month")
 		: "day";
 
 	let groupDateFormat;
 	switch (validGroupBy) {
-		case "hour":
-			groupDateFormat = "%Y-%m-%d %H:00";
-			break;
 		case "day":
 			groupDateFormat = "%Y-%m-%d";
 			break;
@@ -542,7 +537,7 @@ const getMySearchStat = async (
 			groupDateFormat = "%Y-%m";
 			break;
 		default:
-			groupDateFormat = "%Y-%m-%d %H:00";
+			groupDateFormat = "%Y-%m-%d";
 	}
 
 	// Grouping stage with dynamic date format

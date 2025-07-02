@@ -18,7 +18,7 @@ type DateFilter =
 	| "this_month"
 	| "last_month"
 	| "custom";
-type GroupBy = "hour" | "day" | "month";
+type GroupBy = "day" | "month";
 
 interface Filters {
 	dateFilter: DateFilter;
@@ -46,7 +46,6 @@ const filterOptions = [
 ];
 
 const groupByOptions = [
-	{ value: "hour" as const, label: "Hourly" },
 	{ value: "day" as const, label: "Daily" },
 	{ value: "month" as const, label: "Monthly" },
 ];

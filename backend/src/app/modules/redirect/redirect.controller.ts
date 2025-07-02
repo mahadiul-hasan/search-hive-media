@@ -59,12 +59,12 @@ const handleShortUrlClick = async (req: Request, res: Response) => {
 	// Step 3: Hourly timestamp (Asia/Dhaka)
 	const TIMEZONE = "Asia/Dhaka";
 	const now = moment().tz(TIMEZONE);
-	const hourStart = now.startOf("hour").toDate();
+	const dayStart = now.startOf("day").toDate();
 
 	let stat = await SearchStat.findOne({
 		searchFeed: feed._id,
 		user: feed.user,
-		createdAt: hourStart,
+		createdAt: dayStart,
 	});
 
 	if (!stat) {
@@ -76,7 +76,7 @@ const handleShortUrlClick = async (req: Request, res: Response) => {
 			mistake: 0,
 			visitors: 0,
 			unique_ips: 0,
-			createdAt: hourStart,
+			createdAt: dayStart,
 		});
 		await stat.save();
 	}
@@ -85,7 +85,7 @@ const handleShortUrlClick = async (req: Request, res: Response) => {
 	const ipKey = `unique_ips:${stat._id.toString()}`;
 	const isNewIp = await redisClient.sAdd(ipKey, userIp);
 	if (isNewIp === 1) {
-		await redisClient.expire(ipKey, 3600); // 1 hour expiry
+		await redisClient.expire(ipKey, 86400); // 1 day expiry
 	}
 
 	// Step 5: Update stat

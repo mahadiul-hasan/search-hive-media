@@ -21,7 +21,7 @@ type DateFilter =
 	| "this_month"
 	| "last_month"
 	| "custom";
-type GroupBy = "hour" | "day" | "month";
+type GroupBy = "day" | "month";
 
 interface Filters {
 	dateFilter: DateFilter;
@@ -49,7 +49,6 @@ const filterOptions = [
 ];
 
 const groupByOptions = [
-	{ value: "hour" as const, label: "Hourly" },
 	{ value: "day" as const, label: "Daily" },
 	{ value: "month" as const, label: "Monthly" },
 ];
@@ -60,13 +59,13 @@ export default function SearchStat() {
 		from: "",
 		to: "",
 		searchFeedId: "",
-		groupBy: "hour",
+		groupBy: "day",
 	});
 
 	const [appliedFilters, setAppliedFilters] = useState<AppliedFilters>({
 		dateFilter: "today",
 		searchFeedId: "",
-		groupBy: "hour",
+		groupBy: "day",
 	});
 
 	const [page, setPage] = useState(1);
@@ -122,12 +121,12 @@ export default function SearchStat() {
 			from: "",
 			to: "",
 			searchFeedId: "",
-			groupBy: "hour",
+			groupBy: "day",
 		});
 		setAppliedFilters({
 			dateFilter: "today",
 			searchFeedId: "",
-			groupBy: "hour",
+			groupBy: "day",
 		});
 		setPage(1);
 	};
