@@ -75,10 +75,14 @@ export const SearchStatColumns: ColumnDef<ISearchStat>[] = [
 		),
 	},
 	{
-		accessorKey: "mistake",
+		accessorKey: "mistakePercent",
 		header: "Errors",
 		cell: ({ row }: any) => (
-			<div className="text-center">{row.getValue("mistake")}</div>
+			<div className="text-center">
+				{row.original.mistakePercent != null
+					? `${row.original.mistakePercent}%`
+					: "-"}
+			</div>
 		),
 	},
 	{
@@ -89,31 +93,39 @@ export const SearchStatColumns: ColumnDef<ISearchStat>[] = [
 		),
 	},
 	{
-		accessorKey: "unique_ips",
+		accessorKey: "uniqueIpsPercent",
 		header: "Unique IPs",
 		cell: ({ row }: any) => (
-			<div className="text-center">{row.getValue("unique_ips")}</div>
+			<div className="text-center">
+				{row.original.uniqueIpsPercent != null
+					? `${row.original.uniqueIpsPercent}%`
+					: "-"}
+			</div>
 		),
 	},
 	{
-		accessorKey: "visitors",
+		accessorKey: "visitorsPercent",
 		header: "Visitors",
 		cell: ({ row }: any) => (
-			<div className="text-center">{row.getValue("visitors")}</div>
+			<div className="text-center">
+				{row.original.visitorsPercent != null
+					? `${row.original.visitorsPercent}%`
+					: "-"}
+			</div>
 		),
 	},
 	{
 		accessorKey: "ctr",
 		header: "CTR",
 		cell: ({ row }: any) => (
-			<div className="text-center">{row.getValue("ctr")}</div>
+			<div className="text-center">{row.getValue("ctr")}%</div>
 		),
 	},
 	{
 		accessorKey: "coverage",
 		header: "Coverage",
 		cell: ({ row }: any) => (
-			<div className="text-center">{row.getValue("coverage")}</div>
+			<div className="text-center">{row.getValue("coverage")}%</div>
 		),
 	},
 	{
@@ -127,21 +139,21 @@ export const SearchStatColumns: ColumnDef<ISearchStat>[] = [
 		accessorKey: "epc",
 		header: "EPC",
 		cell: ({ row }: any) => (
-			<div className="text-center">{row.getValue("epc")}</div>
+			<div className="text-center">${row.getValue("epc")}</div>
 		),
 	},
 	{
 		accessorKey: "rpm",
 		header: "RPM",
 		cell: ({ row }: any) => (
-			<div className="text-center">{row.getValue("rpm")}</div>
+			<div className="text-center">${row.getValue("rpm")}</div>
 		),
 	},
 	{
 		accessorKey: "revenue",
 		header: "Revenue",
 		cell: ({ row }: any) => (
-			<div className="text-center">{row.getValue("revenue")}</div>
+			<div className="text-center">${row.getValue("revenue")}</div>
 		),
 	},
 	{

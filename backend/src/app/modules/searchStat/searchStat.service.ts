@@ -263,6 +263,57 @@ const getAllSearchStat = async (
 			monetized: { $sum: "$monetized" },
 			unique_ips: { $sum: "$unique_ips" },
 			visitors: { $sum: "$visitors" },
+			mistakePercent: {
+				$cond: [
+					{ $eq: ["$searches", 0] },
+					0,
+					{
+						$round: [
+							{
+								$multiply: [
+									{ $divide: ["$mistake", "$searches"] },
+									100,
+								],
+							},
+							2,
+						],
+					},
+				],
+			},
+			uniqueIpsPercent: {
+				$cond: [
+					{ $eq: ["$searches", 0] },
+					0,
+					{
+						$round: [
+							{
+								$multiply: [
+									{ $divide: ["$unique_ips", "$searches"] },
+									100,
+								],
+							},
+							2,
+						],
+					},
+				],
+			},
+			visitorsPercent: {
+				$cond: [
+					{ $eq: ["$searches", 0] },
+					0,
+					{
+						$round: [
+							{
+								$multiply: [
+									{ $divide: ["$visitors", "$searches"] },
+									100,
+								],
+							},
+							2,
+						],
+					},
+				],
+			},
 			clicks: { $sum: "$clicks" },
 			revenue: { $sum: "$revenue" },
 			firstCreatedAt: { $first: "$createdAt" },
@@ -561,6 +612,57 @@ const getMySearchStat = async (
 			monetized: { $sum: "$monetized" },
 			unique_ips: { $sum: "$unique_ips" },
 			visitors: { $sum: "$visitors" },
+			mistakePercent: {
+				$cond: [
+					{ $eq: ["$searches", 0] },
+					0,
+					{
+						$round: [
+							{
+								$multiply: [
+									{ $divide: ["$mistake", "$searches"] },
+									100,
+								],
+							},
+							2,
+						],
+					},
+				],
+			},
+			uniqueIpsPercent: {
+				$cond: [
+					{ $eq: ["$searches", 0] },
+					0,
+					{
+						$round: [
+							{
+								$multiply: [
+									{ $divide: ["$unique_ips", "$searches"] },
+									100,
+								],
+							},
+							2,
+						],
+					},
+				],
+			},
+			visitorsPercent: {
+				$cond: [
+					{ $eq: ["$searches", 0] },
+					0,
+					{
+						$round: [
+							{
+								$multiply: [
+									{ $divide: ["$visitors", "$searches"] },
+									100,
+								],
+							},
+							2,
+						],
+					},
+				],
+			},
 			clicks: { $sum: "$clicks" },
 			revenue: { $sum: "$revenue" },
 			firstCreatedAt: { $first: "$createdAt" },
