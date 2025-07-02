@@ -263,6 +263,38 @@ const getAllSearchStat = async (
 			monetized: { $sum: "$monetized" },
 			unique_ips: { $sum: "$unique_ips" },
 			visitors: { $sum: "$visitors" },
+			clicks: { $sum: "$clicks" },
+			revenue: { $sum: "$revenue" },
+			firstCreatedAt: { $first: "$createdAt" },
+			ctr: { $avg: "$ctr" },
+			coverage: { $avg: "$coverage" },
+			epc: { $avg: "$epc" },
+			rpm: { $avg: "$rpm" },
+			userId: { $first: "$userId" },
+			searchFeedName: { $first: "$searchFeedName" },
+		},
+	};
+
+	pipeline.push(groupStage);
+
+	// 6. Project to final structure
+	const projectStage = {
+		$project: {
+			_id: "$_id",
+			originalIds: 1,
+			date: "$_id.date",
+			searches: 1,
+			valid: 1,
+			mistake: 1,
+			monetized: 1,
+			unique_ips: 1,
+			visitors: 1,
+			clicks: 1,
+			revenue: 1,
+			ctr: 1,
+			coverage: 1,
+			epc: 1,
+			rpm: 1,
 			mistakePercent: {
 				$cond: [
 					{ $eq: ["$searches", 0] },
@@ -314,48 +346,19 @@ const getAllSearchStat = async (
 					},
 				],
 			},
-			clicks: { $sum: "$clicks" },
-			revenue: { $sum: "$revenue" },
-			firstCreatedAt: { $first: "$createdAt" },
-			ctr: { $avg: "$ctr" },
-			coverage: { $avg: "$coverage" },
-			epc: { $avg: "$epc" },
-			rpm: { $avg: "$rpm" },
-			userId: { $first: "$userId" },
-			searchFeedName: { $first: "$searchFeedName" },
+			user: {
+				_id: "$_id.user",
+				userId: "$userId",
+			},
+			searchFeed: {
+				_id: "$_id.searchFeed",
+				name: "$searchFeedName",
+			},
+			createdAt: "$firstCreatedAt",
 		},
 	};
 
-	pipeline.push(groupStage);
-
-	// 6. Project to final structure
-	const projectStage = {
-		_id: "$_id",
-		originalIds: 1,
-		date: "$_id.date",
-		searches: 1,
-		valid: 1,
-		mistake: 1,
-		monetized: 1,
-		unique_ips: 1,
-		visitors: 1,
-		clicks: 1,
-		revenue: 1,
-		ctr: 1,
-		coverage: 1,
-		epc: 1,
-		rpm: 1,
-		user: {
-			_id: "$_id.user",
-			userId: "$userId",
-		},
-		searchFeed: {
-			_id: "$_id.searchFeed",
-			name: "$searchFeedName",
-		},
-		createdAt: "$firstCreatedAt",
-	};
-	pipeline.push({ $project: projectStage });
+	pipeline.push(projectStage);
 
 	// 7. Sorting
 	pipeline.push({ $sort: { createdAt: -1 } });
@@ -612,6 +615,38 @@ const getMySearchStat = async (
 			monetized: { $sum: "$monetized" },
 			unique_ips: { $sum: "$unique_ips" },
 			visitors: { $sum: "$visitors" },
+			clicks: { $sum: "$clicks" },
+			revenue: { $sum: "$revenue" },
+			firstCreatedAt: { $first: "$createdAt" },
+			ctr: { $avg: "$ctr" },
+			coverage: { $avg: "$coverage" },
+			epc: { $avg: "$epc" },
+			rpm: { $avg: "$rpm" },
+			userId: { $first: "$userId" },
+			searchFeedName: { $first: "$searchFeedName" },
+		},
+	};
+
+	pipeline.push(groupStage);
+
+	// 6. Project to final structure
+	const projectStage = {
+		$project: {
+			_id: "$_id",
+			originalIds: 1,
+			date: "$_id.date",
+			searches: 1,
+			valid: 1,
+			mistake: 1,
+			monetized: 1,
+			unique_ips: 1,
+			visitors: 1,
+			clicks: 1,
+			revenue: 1,
+			ctr: 1,
+			coverage: 1,
+			epc: 1,
+			rpm: 1,
 			mistakePercent: {
 				$cond: [
 					{ $eq: ["$searches", 0] },
@@ -663,48 +698,19 @@ const getMySearchStat = async (
 					},
 				],
 			},
-			clicks: { $sum: "$clicks" },
-			revenue: { $sum: "$revenue" },
-			firstCreatedAt: { $first: "$createdAt" },
-			ctr: { $avg: "$ctr" },
-			coverage: { $avg: "$coverage" },
-			epc: { $avg: "$epc" },
-			rpm: { $avg: "$rpm" },
-			userId: { $first: "$userId" },
-			searchFeedName: { $first: "$searchFeedName" },
+			user: {
+				_id: "$_id.user",
+				userId: "$userId",
+			},
+			searchFeed: {
+				_id: "$_id.searchFeed",
+				name: "$searchFeedName",
+			},
+			createdAt: "$firstCreatedAt",
 		},
 	};
 
-	pipeline.push(groupStage);
-
-	// 6. Project to final structure
-	const projectStage = {
-		_id: "$_id",
-		originalIds: 1,
-		date: "$_id.date",
-		searches: 1,
-		valid: 1,
-		mistake: 1,
-		monetized: 1,
-		unique_ips: 1,
-		visitors: 1,
-		clicks: 1,
-		revenue: 1,
-		ctr: 1,
-		coverage: 1,
-		epc: 1,
-		rpm: 1,
-		user: {
-			_id: "$_id.user",
-			userId: "$userId",
-		},
-		searchFeed: {
-			_id: "$_id.searchFeed",
-			name: "$searchFeedName",
-		},
-		createdAt: "$firstCreatedAt",
-	};
-	pipeline.push({ $project: projectStage });
+	pipeline.push(projectStage);
 
 	// 7. Sorting
 	pipeline.push({ $sort: { createdAt: -1 } });
